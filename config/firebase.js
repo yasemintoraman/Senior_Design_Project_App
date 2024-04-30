@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs} from "firebase/firestore";
+import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs, doc, getDoc} from "firebase/firestore";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,14 +9,14 @@ import { getStorage } from "firebase/storage";
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD8PpK3G3ZW85h-4pdkAsNidDXVo1B5LtA",
-  authDomain: "sdp-app-9fde8.firebaseapp.com",
-  projectId: "sdp-app-9fde8",
-  storageBucket: "sdp-app-9fde8.appspot.com",
-  messagingSenderId: "460349994601",
-  appId: "1:460349994601:web:4d2d4997fe2654ad0f54f8",
+  apiKey: "AIzaSyALUMbaHmGId7oy-ijuTjjD0tceIbOS0kc",
+  authDomain: "sdpapp-5a06e.firebaseapp.com",
+  projectId: "sdpapp-5a06e",
+  storageBucket: "sdpapp-5a06e.appspot.com",
+  messagingSenderId: "384968976538",
+  appId: "1:384968976538:web:bd8aa00837a3fe5812d723",
   //databaseURL: Constants.manifest2.extra.databaseURL,
-  databaseURL: "https://sdp-app-9fde8-default-rtdb.firebaseio.com/",
+  databaseURL: "https://sdpapp-5a06e-default-rtdb.firebaseio.com/"
 };
 
 // Initialize Firebase
@@ -134,6 +134,7 @@ export const listProductsByCategory = async (categoryName) => {
   }
 };
 
+
 export const listProductDetailById = async(productId) => {
   try {
     const q = query(productsRef, where("id", "==", productId));
@@ -147,8 +148,8 @@ export const listProductDetailById = async(productId) => {
     console.error("Ürünleri getirirken hata oluştu:", error);
     throw error;
   }
-
 }
+
 
 
 export const addProduct = async (categoryName,title, description, price, imageUrl) => {
