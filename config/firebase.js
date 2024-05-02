@@ -30,6 +30,8 @@ const productsRef = collection(database,"products"); //eger collection olarak ok
 //const docRef = doc(database, "products/nuz9h8KZoqQnMZ8XjhSq");
 const categoriesRef = collection(database, "categories");
 
+export const chatsRef = collection(database, "chats");
+
 export const useProductsListener = () => {
 const [products, setProducts] = useState([]);
 
@@ -99,6 +101,19 @@ export const listProductDetails = async (id) => {
 };
 */}
 
+export const useUserEmail = () => {
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setEmail(user?.email ?? "");
+    });
+    return unsubscribe;
+  }, []);
+
+  return email;
+};
+
 
 export const useCategoriesListener = () => {
   const [categories, setCategories] = useState([]);
@@ -151,6 +166,28 @@ export const listProductDetailById = async(productId) => {
 }
 
 
+
+{/*export const listChatsByUserEmail = (email) => {
+  const [chats, setChats] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = database.collection("chats")
+      .where("users", "array-contains", email)
+      .onSnapshot((querySnapshot) => {
+        const userChats = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setChats(userChats);
+      });
+      
+    return () => unsubscribe();
+  }, [email]);
+
+  return chats;
+};
+
+*/}
 
 export const addProduct = async (categoryName,title, description, price, imageUrl) => {
   const userName = await AsyncStorage.getItem("email");

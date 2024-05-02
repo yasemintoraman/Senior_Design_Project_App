@@ -7,6 +7,10 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
 import { Provider } from "react-redux";
 
+import { PaperProvider } from "react-native-paper";
+
+//import { Provider } from "react-native-paper";
+
 import CategoriesScreen from "./screens/CategoriesScreen";
 import ProductsOverviewScreen2 from "./screens/ProductsOverviewScreen2";
 import ProductsOverviewScreen3 from "./screens/ProductsOverviewScreen3";
@@ -19,6 +23,9 @@ const Drawer = createDrawerNavigator();
 
 import Login from "./screens/Login";
 import Signup from "./screens/Signup";
+
+import ChatList from "./screens/ChatList";
+import Chat from "./screens/Chat";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./config/firebase";
@@ -39,7 +46,6 @@ const savedIcon = require("./assets/icons/saved.png");
 const settingsIcon_active = require("./assets/icons/settings-active.png");
 const settingsIcon = require("./assets/icons/settings.png");
 const Tab = createBottomTabNavigator();
-
 
 const AuthenticatedUserContext = createContext({});
 
@@ -85,7 +91,7 @@ function DrawerNavigator() {
         }}
       />
 
-<Drawer.Screen
+      <Drawer.Screen
         name="AddProduct"
         component={AddProducts2}
         options={{
@@ -126,7 +132,6 @@ function TabNav() {
         },
         tabBarShowLabel: false,
         tabBarStyle: {
-          position: "absolute",
           padding: 10,
           backgroundColor: "black",
         },
@@ -135,7 +140,7 @@ function TabNav() {
       <Tab.Screen name="Home" component={CategoriesScreen} />
       <Tab.Screen name="Map" component={ProductDetailScreen} />
       <Tab.Screen name="Saved" component={FavoritesScreen} />
-      <Tab.Screen name="Settings" component={ProductsOverviewScreen2} />
+      <Tab.Screen name="Settings" component={ChatList} />
     </Tab.Navigator>
   );
 }
@@ -154,12 +159,16 @@ function AppStack() {
             contentStyle: { backgroundColor: "white" },
           }}
         >
-           <Stack.Screen
+          <Stack.Screen
             name="Drawer"
-            component={DrawerNavigator}
+            component={TabNav}
             options={{
               headerShown: false,
             }}
+          />
+          <Stack.Screen
+            name="Chat"
+            component={Chat}
           />
 
           <Stack.Screen
@@ -213,7 +222,9 @@ function RootNavigator() {
   }
   return (
     <NavigationContainer>
+      <PaperProvider>
       {user ? <AppStack /> : <AuthStack />}
+      </PaperProvider>
     </NavigationContainer>
   );
 }
@@ -229,4 +240,7 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {},
+  footerIcon: {
+    width: 25
+  }
 });
