@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs, doc, getDoc} from "firebase/firestore";
+import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs, doc, updateDoc} from "firebase/firestore";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -158,6 +158,7 @@ export const listProductDetailById = async(productId) => {
       id: doc.id,
       ...doc.data(),
     }));
+
     return productDetails;
   } catch (error) {
     console.error("Ürünleri getirirken hata oluştu:", error);
@@ -166,11 +167,12 @@ export const listProductDetailById = async(productId) => {
 }
 
 
-export const addProduct = async (categoryName,title, description, price, imageUrl,id) => {
+export const addProduct = async (categoryName,title, description, price, imageUrl) => {
   const userName = await AsyncStorage.getItem("email");
   try {
     const uid = auth.currentUser?.uid;
     const user = auth.currentUser;
+    
     if (!uid) {
       throw new Error('Kullanici oturumu bulunamadi.');
     }
@@ -187,9 +189,8 @@ export const addProduct = async (categoryName,title, description, price, imageUr
       price: price,
       title: title,
       uid: uid,
-      id: id,
     });
-    //await updateDoc(doc(productsRef, docRef.id), {id: docRef.id});
+    await updateDoc(doc(productsRef, docRef.id), {id: docRef.id});
    // await updateDoc(doc(productsRef, docRef.id));
     console.log('Ürün basariyla Firestore\'a kaydedildi.');
   } catch (error) {
