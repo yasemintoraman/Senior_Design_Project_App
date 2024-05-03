@@ -20,9 +20,9 @@ const InfoScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
 
   const productId = route.params.productId;
+  console.log(productId);
 
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
+  const [selectedProduct, setSelectedProduct] = useState("");
 
   useEffect(() => {
     const fetchProductDetails = async () => {

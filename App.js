@@ -138,7 +138,7 @@ function TabNav() {
       })}
     >
       <Tab.Screen name="Home" component={CategoriesScreen} />
-      <Tab.Screen name="Map" component={ProductDetailScreen} />
+      <Tab.Screen name="Map" component={AddProducts2} />
       <Tab.Screen name="Saved" component={FavoritesScreen} />
       <Tab.Screen name="Settings" component={ChatList} />
     </Tab.Navigator>

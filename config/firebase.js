@@ -166,30 +166,7 @@ export const listProductDetailById = async(productId) => {
 }
 
 
-
-{/*export const listChatsByUserEmail = (email) => {
-  const [chats, setChats] = useState([]);
-
-  useEffect(() => {
-    const unsubscribe = database.collection("chats")
-      .where("users", "array-contains", email)
-      .onSnapshot((querySnapshot) => {
-        const userChats = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setChats(userChats);
-      });
-      
-    return () => unsubscribe();
-  }, [email]);
-
-  return chats;
-};
-
-*/}
-
-export const addProduct = async (categoryName,title, description, price, imageUrl) => {
+export const addProduct = async (categoryName,title, description, price, imageUrl,id) => {
   const userName = await AsyncStorage.getItem("email");
   try {
     const uid = auth.currentUser?.uid;
@@ -210,7 +187,7 @@ export const addProduct = async (categoryName,title, description, price, imageUr
       price: price,
       title: title,
       uid: uid,
-     // id: id,
+      id: id,
     });
     //await updateDoc(doc(productsRef, docRef.id), {id: docRef.id});
    // await updateDoc(doc(productsRef, docRef.id));

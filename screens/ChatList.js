@@ -15,7 +15,6 @@ import { useNavigation } from "@react-navigation/native";
 import { onSnapshot, addDoc, query, where} from "firebase/firestore";
 
 import { chatsRef, useUserEmail } from "../config/firebase";
-import Chat from "./Chat";
 
 
 
