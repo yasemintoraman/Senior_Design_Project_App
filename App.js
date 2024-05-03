@@ -138,7 +138,7 @@ function TabNav() {
       })}
     >
       <Tab.Screen name="Home" component={CategoriesScreen} />
-      <Tab.Screen name="Map" component={AddProducts2} />
+      <Tab.Screen name="Map" component={InfoScreen} />
       <Tab.Screen name="Saved" component={FavoritesScreen} />
       <Tab.Screen name="Settings" component={ChatList} />
     </Tab.Navigator>
@@ -169,6 +169,10 @@ function AppStack() {
           <Stack.Screen
             name="Chat"
             component={Chat}
+          />
+          <Stack.Screen
+            name="ChatList"
+            component={ChatList}
           />
 
           <Stack.Screen

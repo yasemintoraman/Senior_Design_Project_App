@@ -46,6 +46,14 @@ const InfoScreen = ({ route, navigation }) => {
     }
   }
 
+  
+  function pressHandler() {
+    navigation.navigate("ChatList", { //target screen
+    });
+  }
+
+
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -86,7 +94,8 @@ const InfoScreen = ({ route, navigation }) => {
         <Text style={styles.propertiesText}>Properties</Text>
 
         <TouchableOpacity style={styles.rentButton}>
-          <Text style={styles.rentButtonText}>Send Message</Text>
+          <Text style={styles.rentButtonText}
+          onPress={pressHandler}>Send Message</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
