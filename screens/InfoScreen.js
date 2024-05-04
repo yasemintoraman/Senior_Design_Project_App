@@ -8,12 +8,17 @@ import {
   View,
 } from "react-native";
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 
-import IconButton from '../components/IconButton';
-import { addFavorite, removeFavorite } from '../store/redux/favorites';
+import IconButton from "../components/IconButton";
+import { addFavorite, removeFavorite } from "../store/redux/favorites";
 import { listProductDetailById } from "../config/firebase";
 
+import { chatsRef, useUserEmail, auth } from "../config/firebase";
+
+import { useNavigation } from "@react-navigation/native";
+
+import { onSnapshot, addDoc, query, where, getDocs } from "firebase/firestore";
 
 const InfoScreen = ({ route, navigation }) => {
   const favoriteProductIds = useSelector((state) => state.favoriteProducts.ids);
@@ -22,6 +27,9 @@ const InfoScreen = ({ route, navigation }) => {
   const productId = route.params.productId;
 
   const [selectedProduct, setSelectedProduct] = useState("");
+  const [currentUserEmail, setCurrentUserEmail] = useState("");
+
+  const userEmail = selectedProduct.addedBy;
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -29,12 +37,24 @@ const InfoScreen = ({ route, navigation }) => {
         const productDetails = await listProductDetailById(productId);
         setSelectedProduct(productDetails[0]);
       } catch (error) {
-        console.error('Ürün detaylarını getirirken hata oluştu:', error);
+        console.error("Ürün detaylarını getirirken hata oluştu:", error);
       }
     };
 
     fetchProductDetails();
   }, [productId]);
+
+  console.log(userEmail);
+
+  // Kullanıcının oturum durumunu dinleyip, emailini alıyoruz
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setCurrentUserEmail(user?.email ?? ""); // Eğer kullanıcı oturum açık değilse null dönecek
+    });
+    return unsubscribe; // useEffect içinde fonksiyon dönerek, component kaldırıldığında dinleyiciyi kaldırıyoruz
+  }, []);
+
+  //console.log(selectedProduct.addedBy);
 
   const productIsFavorite = favoriteProductIds.includes(productId);
 
@@ -46,19 +66,50 @@ const InfoScreen = ({ route, navigation }) => {
     }
   }
 
+  async function pressHandler() {
+    if (!currentUserEmail || !userEmail) return;
   
-  function pressHandler() {
-    navigation.navigate("ChatList", { //target screen
-    });
+    try {
+      // Kullanıcıları sıralayarak sorguyu oluştur
+      const sortedUsers = [currentUserEmail, userEmail].sort().join(',');
+      const chatQuery = query(
+        chatsRef,
+        where("users", "array-contains-any", [currentUserEmail, userEmail])
+      );
+      const chatSnapshot = await getDocs(chatQuery);
+  
+      let chatId = null;
+  
+      chatSnapshot.forEach(doc => {
+        const chatData = doc.data();
+        const chatUsers = chatData.users;
+        if (chatUsers.length === 2 && chatUsers.includes(currentUserEmail) && chatUsers.includes(userEmail)) {
+          // Tüm üyeler bu iki kullanıcıysa, chatId'yi güncelle ve döngüyü sonlandır
+          chatId = doc.id;
+          return;
+        }
+      });
+  
+      if (chatId) {
+        // Mevcut bir sohbet bulundu, Chat ekranını aç
+        navigation.navigate("Chat", { chatId });
+      } else {
+        // Mevcut bir sohbet yoksa yeni bir sohbet oluştur
+        const response = await addDoc(chatsRef, {
+          users: [currentUserEmail, userEmail], // Diziyi kullanıcıların e-postalarıyla oluştur
+        });
+        navigation.navigate("Chat", { chatId: response.id });
+      }
+    } catch (error) {
+      console.error("Sohbet işlemi sırasında bir hata oluştu:", error);
+    }
   }
-
-
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <IconButton
-          icon={productIsFavorite ? 'star' : 'star-outline'}
+          icon={productIsFavorite ? "star" : "star-outline"}
           color="white"
           onPress={changeFavoriteStatusHandler}
         />
@@ -85,17 +136,20 @@ const InfoScreen = ({ route, navigation }) => {
               {selectedProduct && selectedProduct.title}
             </Text>
             <Text style={styles.price}>
-              <Text style={styles.amount}>${selectedProduct && selectedProduct.price}</Text>
+              <Text style={styles.amount}>
+                ${selectedProduct && selectedProduct.price}
+              </Text>
             </Text>
           </View>
         </View>
 
-        <Text style={styles.descriptionText}>{selectedProduct && selectedProduct.description}</Text>
+        <Text style={styles.descriptionText}>
+          {selectedProduct && selectedProduct.description}
+        </Text>
         <Text style={styles.propertiesText}>Properties</Text>
 
-        <TouchableOpacity style={styles.rentButton}>
-          <Text style={styles.rentButtonText}
-          onPress={pressHandler}>Send Message</Text>
+        <TouchableOpacity style={styles.rentButton} onPress={pressHandler}>
+          <Text style={styles.rentButtonText}>Send Message</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

@@ -11,7 +11,9 @@ import { database } from "../config/firebase";
 
 import { auth } from "../config/firebase";
 
+
 const Chat = () => {
+
   const route = useRoute();
 
   const [messages, setMessages] = useState([]);
