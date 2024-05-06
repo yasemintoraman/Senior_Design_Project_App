@@ -39,14 +39,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AddProducts from "./screens/AddProducts";
 import AddProducts2 from "./screens/AddProducts2";
 
-const homeIcon_active = require("./assets/icons/home-active.png");
-const homeIcon = require("./assets/icons/home.png");
-const compass_active = require("./assets/icons/compass-active.png");
-const compass = require("./assets/icons/compass.png");
-const savedIcon_active = require("./assets/icons/saved-active.png");
-const savedIcon = require("./assets/icons/saved.png");
-const settingsIcon_active = require("./assets/icons/settings-active.png");
-const settingsIcon = require("./assets/icons/settings.png");
 const Tab = createBottomTabNavigator();
 
 const AuthenticatedUserContext = createContext({});
