@@ -7,6 +7,8 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
 import { Provider } from "react-redux";
 
+import Ionic from "react-native-vector-icons/Ionicons";
+
 import { PaperProvider } from "react-native-paper";
 
 //import { Provider } from "react-native-paper";
@@ -109,26 +111,28 @@ function TabNav() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarIcon: ({ focused }) => {
+        tabBarIcon: ({ focused, size, color }) => {
           let iconName;
 
           if (route.name === "Home") {
-            iconName = focused ? homeIcon_active : homeIcon;
-          } else if (route.name === "Map") {
-            iconName = focused ? compass_active : compass;
-          } else if (route.name === "Saved") {
-            iconName = focused ? savedIcon_active : savedIcon;
-          } else if (route.name === "Settings") {
-            iconName = focused ? settingsIcon_active : settingsIcon;
+            iconName = focused ? "home" : "home-outline";
+            size = focused ? size + 8 : size + 5;
+          } else if (route.name === "Favorites") {
+            iconName = focused ? "star" : "star-outline";
+            size = focused ? size + 8 : size + 5;
+          } else if (route.name === "AddProduct") {
+            iconName = focused ? "add-circle" : "add-circle-outline";
+            size = focused ? size + 8 : size + 5;
+          } else if (route.name === "Messages") {
+            iconName = focused ? "mail" : "mail-outline";
+            size = focused ? size + 8 : size + 5;
+          } else if (route.name === "UserProfile") {
+            iconName = focused
+              ? "person-circle-sharp"
+              : "person-circle-outline";
+            size = focused ? size + 8 : size + 5;
           }
-
-          return (
-            <Image
-              source={iconName}
-              resizeMode="contain"
-              style={styles.footerIcon}
-            />
-          );
+          return <Ionic name={iconName} size={size} color={color} />;
         },
         tabBarShowLabel: false,
         tabBarStyle: {
@@ -138,9 +142,10 @@ function TabNav() {
       })}
     >
       <Tab.Screen name="Home" component={CategoriesScreen} />
-      <Tab.Screen name="Map" component={AddProducts2} />
-      <Tab.Screen name="Saved" component={FavoritesScreen} />
-      <Tab.Screen name="Settings" component={ChatList} />
+      <Tab.Screen name="Favorites" component={FavoritesScreen} />
+      <Tab.Screen name="AddProduct" component={AddProducts2} />
+      <Tab.Screen name="Messages" component={ChatList} />
+      <Tab.Screen name="UserProfile" component={ChatList} />
     </Tab.Navigator>
   );
 }
@@ -166,14 +171,8 @@ function AppStack() {
               headerShown: false,
             }}
           />
-          <Stack.Screen
-            name="Chat"
-            component={Chat}
-          />
-          <Stack.Screen
-            name="ChatList"
-            component={ChatList}
-          />
+          <Stack.Screen name="Chat" component={Chat} />
+          <Stack.Screen name="ChatList" component={ChatList} />
 
           <Stack.Screen
             name="ProductsOverview"
@@ -226,9 +225,7 @@ function RootNavigator() {
   }
   return (
     <NavigationContainer>
-      <PaperProvider>
-      {user ? <AppStack /> : <AuthStack />}
-      </PaperProvider>
+      <PaperProvider>{user ? <AppStack /> : <AuthStack />}</PaperProvider>
     </NavigationContainer>
   );
 }
@@ -245,6 +242,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {},
   footerIcon: {
-    width: 25
-  }
+    width: 25,
+  },
 });
