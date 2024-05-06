@@ -68,6 +68,11 @@ const InfoScreen = ({ route, navigation }) => {
 
   async function pressHandler() {
     if (!currentUserEmail || !userEmail) return;
+
+    if (currentUserEmail === userEmail) {
+      console.error("Hata: Giriş yaptığınız e-posta ile alıcı e-posta aynı olamaz."); //bunu window haline getir!
+      return;
+    }
   
     try {
       // Kullanıcıları sıralayarak sorguyu oluştur
