@@ -101,7 +101,7 @@ export default function Signup({ navigation }) {
           }}
         >
           <Text style={{ color: "gray", fontWeight: "600", fontSize: 14 }}>
-            Don't have an account?{" "}
+            Already have an account?{" "}
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
             <Text style={{ color: "#f57c00", fontWeight: "600", fontSize: 14 }}>

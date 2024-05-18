@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs, doc, updateDoc} from "firebase/firestore";
+import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs, doc, updateDoc, serverTimestamp} from "firebase/firestore";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -156,6 +156,7 @@ export const listProductDetailById = async(productId) => {
     const querySnapshot = await getDocs(q);
     const productDetails = querySnapshot.docs.map((doc) => ({
       id: doc.id,
+      createdAt : doc.data().createdAt?.toDate(),
       ...doc.data(),
     }));
 
@@ -189,6 +190,7 @@ export const addProduct = async (categoryName,title, description, price, imageUr
       price: price,
       title: title,
       uid: uid,
+      createdAt: new Date(),
     });
     await updateDoc(doc(productsRef, docRef.id), {id: docRef.id});
    // await updateDoc(doc(productsRef, docRef.id));

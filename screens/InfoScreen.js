@@ -21,6 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { onSnapshot, addDoc, query, where, getDocs } from "firebase/firestore";
 
 const InfoScreen = ({ route, navigation }) => {
+
   const favoriteProductIds = useSelector((state) => state.favoriteProducts.ids);
   const dispatch = useDispatch();
 
@@ -57,6 +58,7 @@ const InfoScreen = ({ route, navigation }) => {
   //console.log(selectedProduct.addedBy);
 
   const productIsFavorite = favoriteProductIds.includes(productId);
+
 
   function changeFavoriteStatusHandler() {
     if (productIsFavorite) {
@@ -122,6 +124,11 @@ const InfoScreen = ({ route, navigation }) => {
     });
   }, [navigation, changeFavoriteStatusHandler]);
 
+  console.log(selectedProduct.createdAt);
+
+  //let dateAdded = new Date(parsedFileContents.selectedProduct.createdAt[i].DateAdded + "T00:00:00");
+  //console.log(dateAdded);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -151,7 +158,7 @@ const InfoScreen = ({ route, navigation }) => {
         <Text style={styles.descriptionText}>
           {selectedProduct && selectedProduct.description}
         </Text>
-        <Text style={styles.propertiesText}>Properties</Text>
+        <Text style={styles.propertiesText}>Properties:{selectedProduct && selectedProduct.createdAt}</Text>
 
         <TouchableOpacity style={styles.rentButton} onPress={pressHandler}>
           <Text style={styles.rentButtonText}>Send Message</Text>
@@ -193,40 +200,24 @@ const styles = StyleSheet.create({
 
   imageSection: {
     width: "100%",
-    height: 250,
+    height: 350,
     justifyContent: "center",
     alignItems: "center",
   },
   productImage: {
-    width: 300,
-    height: 300,
+    width: "100%",
+    height: "100%",
   },
 
-  headSection: {},
+  headSection: {
+    marginTop: 20,
+  },
   topTextArea: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
   makemodelText: {
     fontSize: 20,
-    fontWeight: "500",
-  },
-  price: {
-    fontWeight: "400",
-  },
-  amount: {
-    fontWeight: "bold",
-  },
-  typetranText: {
-    marginTop: 1,
-    color: "#696969",
-    fontWeight: "600",
-    fontSize: 12,
-  },
-  descriptionText: {
-    marginTop: 30,
-    fontSize: 14,
-    letterSpacing: 0.1,
     lineHeight: 18,
     color: "#696969",
     fontWeight: "500",

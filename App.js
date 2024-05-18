@@ -131,6 +131,8 @@ function TabNav() {
           padding: 10,
           backgroundColor: "black",
         },
+        //tabBarActiveTintColor: 'white', // active icon color
+        //tabBarInactiveTintColor: 'gray', // inactive icon color
       })}
     >
       <Tab.Screen name="Home" component={CategoriesScreen} />
@@ -151,18 +153,19 @@ function AppStack() {
       <Provider store={store}>
         <Stack.Navigator
           screenOptions={{
-            headerStyle: { backgroundColor: "#ef9b47" },
-            headerTintColor: "white",
+            headerStyle: { backgroundColor: "#ef9b47"} ,      //white
+            headerTintColor: "#e2eae3",
             contentStyle: { backgroundColor: "white" },
           }}
         >
           <Stack.Screen
-            name="Drawer"
+            name = "Drawer"
             component={TabNav}
             options={{
-              headerShown: false,
+              headerShown: true,
             }}
           />
+
           <Stack.Screen name="Chat" component={Chat} />
           <Stack.Screen name="ChatList" component={ChatList} />
 
