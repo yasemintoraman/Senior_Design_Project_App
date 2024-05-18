@@ -98,6 +98,31 @@ function DrawerNavigator() {
   );
 }
 
+function HomeStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: "#ef9b47" },
+        headerTintColor: "#e2eae3",
+        contentStyle: { backgroundColor: "white" },
+      }}
+    >
+      <Stack.Screen name="Categories" component={CategoriesScreen} />
+      <Stack.Screen
+        name="ProductsOverview"
+        component={ProductsOverviewScreen2}
+      />
+      <Stack.Screen
+        name="ProductDetail"
+        component={InfoScreen}
+        options={{
+          title: "About the Product",
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
 function TabNav() {
   return (
     <Tab.Navigator
@@ -105,7 +130,6 @@ function TabNav() {
         headerShown: false,
         tabBarIcon: ({ focused, size, color }) => {
           let iconName;
-
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
             size = focused ? size + 8 : size + 5;
@@ -131,11 +155,9 @@ function TabNav() {
           padding: 10,
           backgroundColor: "black",
         },
-        //tabBarActiveTintColor: 'white', // active icon color
-        //tabBarInactiveTintColor: 'gray', // inactive icon color
       })}
     >
-      <Tab.Screen name="Home" component={CategoriesScreen} />
+      <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Favorites" component={FavoritesScreen} />
       <Tab.Screen name="AddProduct" component={AddProducts2} />
       <Tab.Screen name="Messages" component={ChatList} />
@@ -146,46 +168,15 @@ function TabNav() {
 
 function AppStack() {
   return (
-    //fragment tags
     <>
       <StatusBar style="light" />
-      {/*<FavoritesContextProvider> */}
       <Provider store={store}>
-        <Stack.Navigator
-          screenOptions={{
-            headerStyle: { backgroundColor: "#ef9b47"} ,      //white
-            headerTintColor: "#e2eae3",
-            contentStyle: { backgroundColor: "white" },
-          }}
-        >
-          <Stack.Screen
-            name = "Drawer"
-            component={TabNav}
-            options={{
-              headerShown: true,
-            }}
-          />
-
-          <Stack.Screen name="Chat" component={Chat} />
-          <Stack.Screen name="ChatList" component={ChatList} />
-
-          <Stack.Screen
-            name="ProductsOverview"
-            component={ProductsOverviewScreen2}
-          />
-          <Stack.Screen
-            name="ProductDetail"
-            component={InfoScreen}
-            options={{
-              title: "About the Product",
-            }}
-          />
-        </Stack.Navigator>
+        <TabNav />
       </Provider>
-      {/* </FavoritesContextProvider> */}
     </>
   );
 }
+
 
 function AuthStack() {
   return (
