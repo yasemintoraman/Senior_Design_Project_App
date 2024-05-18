@@ -131,16 +131,16 @@ const InfoScreen = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      {selectedProduct && selectedProduct.imageUrl && (
         <View style={styles.imageSection}>
-          {selectedProduct && (
-            <Image
-              source={{ uri: selectedProduct.imageUrl }}
-              resizeMode="contain"
-              style={styles.productImage}
-            />
-          )}
+          <Image
+            source={{ uri: selectedProduct.imageUrl }}
+            resizeMode="contain"
+            style={styles.productImage}
+          />
         </View>
+      )}
 
         <View style={styles.headSection}>
           <View style={styles.topTextArea}>
