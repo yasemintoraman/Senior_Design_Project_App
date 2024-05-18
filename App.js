@@ -123,11 +123,68 @@ function HomeStack() {
   );
 }
 
+function FavoritesStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: "#ef9b47" },
+        headerTintColor: "#e2eae3",
+        contentStyle: { backgroundColor: "white" },
+      }}
+    >
+      <Stack.Screen name="Favorites" component={FavoritesScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function AddProductStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: "#ef9b47" },
+        headerTintColor: "#e2eae3",
+        contentStyle: { backgroundColor: "white" },
+      }}
+    >
+      <Stack.Screen name="AddProduct" component={AddProducts2} />
+    </Stack.Navigator>
+  );
+}
+
+function MessagesStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: "#ef9b47" },
+        headerTintColor: "#e2eae3",
+        contentStyle: { backgroundColor: "white" },
+      }}
+    >
+      <Stack.Screen name="Messages" component={ChatList} />
+      <Stack.Screen name="Chat" component={Chat} />
+    </Stack.Navigator>
+  );
+}
+
+function UserProfileStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: "#ef9b47" },
+        headerTintColor: "#e2eae3",
+        contentStyle: { backgroundColor: "white" },
+      }}
+    >
+      <Stack.Screen name="UserProfile" component={ChatList} />
+    </Stack.Navigator>
+  );
+}
+
 function TabNav() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false,
+        headerShown: false, // Hide the TabNavigator header
         tabBarIcon: ({ focused, size, color }) => {
           let iconName;
           if (route.name === "Home") {
@@ -158,10 +215,10 @@ function TabNav() {
       })}
     >
       <Tab.Screen name="Home" component={HomeStack} />
-      <Tab.Screen name="Favorites" component={FavoritesScreen} />
-      <Tab.Screen name="AddProduct" component={AddProducts2} />
-      <Tab.Screen name="Messages" component={ChatList} />
-      <Tab.Screen name="UserProfile" component={ChatList} />
+      <Tab.Screen name="Favorites" component={FavoritesStack} />
+      <Tab.Screen name="AddProduct" component={AddProductStack} />
+      <Tab.Screen name="Messages" component={MessagesStack} />
+      <Tab.Screen name="UserProfile" component={UserProfileStack} />
     </Tab.Navigator>
   );
 }
