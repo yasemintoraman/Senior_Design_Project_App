@@ -12,8 +12,10 @@ import {
   Alert,
 } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { auth, database } from "../config/firebase";
 const backImage = require("../assets/backImage.png");
+
+import { addDoc, collection } from "firebase/firestore";
 
 export default function Signup({ navigation }) {
   const [userName, setUserName] = useState("");
@@ -22,11 +24,31 @@ export default function Signup({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const onHandleSignup = () => {
+{/**   const onHandleSignup = () => {
     if (email !== "" && password !== "") {
       createUserWithEmailAndPassword(auth, email, password)
         .then(() => console.log("Signup success"))
         .catch((err) => Alert.alert("Login error", err.message));
+    }
+  };*/}
+
+  const onHandleSignup = async () => {
+    if (email !== "" && password !== "") {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        // Firestore'da kullanıcı profili oluşturma
+        await addDoc(collection(database, "users"), {
+          uid: user.uid,
+          userName: userName,
+          name: name,
+          surname: surname,
+          email: email,
+        });
+        console.log("Signup success");
+      } catch (err) {
+        Alert.alert("Signup error", err.message);
+      }
     }
   };
 

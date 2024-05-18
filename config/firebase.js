@@ -169,7 +169,6 @@ export const listProductDetailById = async(productId) => {
 
 
 export const addProduct = async (categoryName,title, description, price, imageUrl) => {
-  const userName = await AsyncStorage.getItem("email");
   try {
     const uid = auth.currentUser?.uid;
     const user = auth.currentUser;
@@ -181,16 +180,27 @@ export const addProduct = async (categoryName,title, description, price, imageUr
       throw new Error('Kullanici oturumu bulunamadi.');
     }
 
+        // Kullanıcı profilini Firestore'dan al
+        const userRef = collection(database, "users");
+        const q = query(userRef, where("uid", "==", uid));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+          throw new Error('Kullanıcı bilgileri bulunamadı.');
+        }
+    
+        const userProfile = querySnapshot.docs[0].data();
+
     const productsRef = collection(database, 'products');
     const docRef = await addDoc(productsRef, {
-      addedBy: user.email,
+      //addedBy: userProfile.userName,
+      addedBy : user.email,
       categoryName: categoryName,
       description: description,
       imageUrl: imageUrl,
       price: price,
       title: title,
       uid: uid,
-      createdAt: new Date(),
     });
     await updateDoc(doc(productsRef, docRef.id), {id: docRef.id});
    // await updateDoc(doc(productsRef, docRef.id));

@@ -31,6 +31,7 @@ const InfoScreen = ({ route, navigation }) => {
   const [currentUserEmail, setCurrentUserEmail] = useState("");
 
   const userEmail = selectedProduct.addedBy;
+  const userName = selectedProduct.addedBy.userName;
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -125,6 +126,7 @@ const InfoScreen = ({ route, navigation }) => {
   }, [navigation, changeFavoriteStatusHandler]);
 
   console.log(selectedProduct.createdAt);
+  console.log(userName);
 
   //let dateAdded = new Date(parsedFileContents.selectedProduct.createdAt[i].DateAdded + "T00:00:00");
   //console.log(dateAdded);
