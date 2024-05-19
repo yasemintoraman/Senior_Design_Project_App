@@ -96,7 +96,7 @@ const ChatList = () => {
   return (
     <View style={{ flex: 1 }}>
       {chats.map((chat) => (
-        <React.Fragment>
+        <React.Fragment key={chat.id}>
           <List.Item
             title={chat.users.find((x) => x !== email)}
             description={(chat.messages ?? [])[0]?.text ?? undefined}
