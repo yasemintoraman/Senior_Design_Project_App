@@ -168,7 +168,7 @@ export const listProductDetailById = async(productId) => {
 }
 
 
-export const addProduct = async (categoryName,title, description, price, imageUrl) => {
+export const addProduct = async (categoryName,title, description, price, imageUrl = "") => {
   try {
     const uid = auth.currentUser?.uid;
     const user = auth.currentUser;

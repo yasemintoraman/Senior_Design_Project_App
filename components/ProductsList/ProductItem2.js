@@ -27,11 +27,16 @@ function ProductItem2({ id, title, imageUrl, price }) {
         onPress={selectProductItemHandler}
       >
         <View style={styles.innerContainer}>
+          {imageUrl ? (
           <View>
               <Image source={{ uri: imageUrl }} style={styles.image} />
-          
             <Text style={styles.title}>{title}</Text>
           </View>
+          ) : (
+            <View>
+                          <Text style={styles.title}>{title}</Text>
+            </View>)}
+
           <ProductDetails price={price} />
         </View>
       </Pressable>

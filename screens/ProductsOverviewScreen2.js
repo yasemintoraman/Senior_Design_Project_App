@@ -49,11 +49,17 @@ function ProductsOverviewScreen2({ route, navigation }) {
     );
   }
 
-  return showImage ? (
+  return (
+    <ProductsList items={displayedProducts} onPress={pressHandler} />
+  )
+
+ {/*return showImage ? (
     <ProductsList items={displayedProducts} onPress={pressHandler} />
   ) : (
     <ProductsList2 items={displayedProducts} onPress={pressHandler} />
-  );
+  );*/}
+
+
 
   {/*}
   return catName === "Jobs" ? (

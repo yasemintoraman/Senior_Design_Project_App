@@ -96,25 +96,26 @@ const AddProducts2 = () => {
     //console.log("Dosya adı:", imageData.assets[0].fileName);
     //const reference = storage().ref(imageData.assets[0].fileName);
     try {
-      if (!imageData.assets[0].uri) {
-        console.error("Dosya seçilmedi.");
-        return;
+      let imageUrl = "";
+
+      if (imageData.assets[0].uri) {
+        //console.error("Dosya seçilmedi.");
+        const uri = imageData.assets[0].uri;
+        const fileName = "file_" + Date.now(); // Zaman damgası kullanma: Dosyanın yüklendiği zamanı içeren bir zaman damgası kullanabilirsiniz. Bu, dosyaların sıralanmasına ve tanımlanmasına yardımcı olabilir.
+        const storageRef = ref(storage, fileName);
+  
+        const response = await fetch(uri);
+        const blob = await response.blob();
+  
+        await uploadBytes(storageRef, blob);
+  
+        // Dosyanın URL'sini alın
+        imageUrl = await getDownloadURL(storageRef);
+        console.log("Dosya URL'si:", imageUrl);
+
+        setImageUrl(imageUrl);
       }
 
-      const uri = imageData.assets[0].uri;
-      const fileName = "file_" + Date.now(); // Zaman damgası kullanma: Dosyanın yüklendiği zamanı içeren bir zaman damgası kullanabilirsiniz. Bu, dosyaların sıralanmasına ve tanımlanmasına yardımcı olabilir.
-      const storageRef = ref(storage, fileName);
-
-      const response = await fetch(uri);
-      const blob = await response.blob();
-
-      await uploadBytes(storageRef, blob);
-
-      // Dosyanın URL'sini alın
-      const imageUrl = await getDownloadURL(storageRef);
-      console.log("Dosya URL'si:", imageUrl);
-
-      setImageUrl(imageUrl);
       addProduct(
         productCategory,
         productName,
