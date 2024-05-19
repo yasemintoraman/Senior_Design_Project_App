@@ -51,7 +51,7 @@ const AuthenticatedUserProvider = ({ children }) => {
     </AuthenticatedUserContext.Provider>
   );
 };
-
+{/** 
 function DrawerNavigator() {
   return (
     <Drawer.Navigator
@@ -96,7 +96,7 @@ function DrawerNavigator() {
       />
     </Drawer.Navigator>
   );
-}
+}*/}
 
 function HomeStack() {
   return (
@@ -107,7 +107,7 @@ function HomeStack() {
         contentStyle: { backgroundColor: "white" },
       }}
     >
-      <Stack.Screen name="Categories" component={CategoriesScreen} />
+      <Stack.Screen name="HomeCategories" component={CategoriesScreen} />
       <Stack.Screen
         name="ProductsOverview"
         component={ProductsOverviewScreen2}
@@ -190,16 +190,16 @@ function TabNav() {
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
             size = focused ? size + 8 : size + 5;
-          } else if (route.name === "Favorites") {
+          } else if (route.name === "FavoritesTab") {
             iconName = focused ? "star" : "star-outline";
             size = focused ? size + 8 : size + 5;
-          } else if (route.name === "AddProduct") {
+          } else if (route.name === "AddProductTab") {
             iconName = focused ? "add-circle" : "add-circle-outline";
             size = focused ? size + 8 : size + 5;
-          } else if (route.name === "Messages") {
+          } else if (route.name === "MessagesTab") {
             iconName = focused ? "mail" : "mail-outline";
             size = focused ? size + 8 : size + 5;
-          } else if (route.name === "UserProfile") {
+          } else if (route.name === "UserProfileTab") {
             iconName = focused
               ? "person-circle-sharp"
               : "person-circle-outline";
@@ -215,10 +215,10 @@ function TabNav() {
       })}
     >
       <Tab.Screen name="Home" component={HomeStack} />
-      <Tab.Screen name="Favorites" component={FavoritesStack} />
-      <Tab.Screen name="AddProduct" component={AddProductStack} />
-      <Tab.Screen name="Messages" component={MessagesStack} />
-      <Tab.Screen name="UserProfile" component={UserProfileStack} />
+      <Tab.Screen name="FavoritesTab" component={FavoritesStack} />
+      <Tab.Screen name="AddProductTab" component={AddProductStack} />
+      <Tab.Screen name="MessagesTab" component={MessagesStack} />
+      <Tab.Screen name="UserProfileTab" component={UserProfileStack} />
     </Tab.Navigator>
   );
 }
