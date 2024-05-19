@@ -5,7 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 
 import Ionic from "react-native-vector-icons/Ionicons";
 
@@ -33,7 +33,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./config/firebase";
 import InfoScreen from "./screens/InfoScreen";
 
-import { useProductsListener } from "./config/firebase";
+import { useProductsListener, useLoadFavorites, useUserEmail } from "./config/firebase";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AddProducts from "./screens/AddProducts";
@@ -124,6 +124,10 @@ function HomeStack() {
 }
 
 function FavoritesStack() {
+  const userEmail = useUserEmail();
+  const dispatch = useDispatch();
+
+  useLoadFavorites(userEmail, dispatch);
   return (
     <Stack.Navigator
       screenOptions={{

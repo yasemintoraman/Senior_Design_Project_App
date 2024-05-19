@@ -11,10 +11,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import IconButton from "../components/IconButton";
-import { addFavorite, removeFavorite } from "../store/redux/favorites";
-import { listProductDetailById } from "../config/firebase";
-
-import { chatsRef, useUserEmail, auth } from "../config/firebase";
+import { addFavorite, removeFavorite, setFavorites } from "../store/redux/favorites";
+import { listProductDetailById, addFavoriteToFirestore, removeFavoriteFromFirestore, chatsRef, useUserEmail, auth } from "../config/firebase";
 
 import { useNavigation } from "@react-navigation/native";
 
@@ -63,8 +61,10 @@ const InfoScreen = ({ route, navigation }) => {
   function changeFavoriteStatusHandler() {
     if (productIsFavorite) {
       dispatch(removeFavorite({ id: productId }));
+      removeFavoriteFromFirestore(currentUserEmail, productId);
     } else {
       dispatch(addFavorite({ id: productId }));
+      addFavoriteToFirestore(currentUserEmail, productId);
     }
   }
 

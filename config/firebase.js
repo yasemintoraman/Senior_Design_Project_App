@@ -1,11 +1,12 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs, doc, updateDoc, serverTimestamp} from "firebase/firestore";
+import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, setDoc, serverTimestamp} from "firebase/firestore";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getStorage } from "firebase/storage";
+import { setFavorites } from "../store/redux/favorites";
 
 
 const firebaseConfig = {
@@ -31,6 +32,8 @@ const productsRef = collection(database,"products"); //eger collection olarak ok
 const categoriesRef = collection(database, "categories");
 
 export const chatsRef = collection(database, "chats");
+
+const favoritesRef = collection(database, "favorites");
 
 export const useProductsListener = () => {
 const [products, setProducts] = useState([]);
@@ -166,6 +169,39 @@ export const listProductDetailById = async(productId) => {
     throw error;
   }
 }
+
+export const addFavoriteToFirestore = async (userId, productId) => {
+  try {
+    await setDoc(doc(database, "favorites", `${userId}_${productId}`), {
+      userId,
+      productId,
+    });
+  } catch (error) {
+    console.error("Favori ürünü eklerken hata oluştu:", error);
+  }
+};
+
+export const removeFavoriteFromFirestore = async (userId, productId) => {
+  try {
+    await deleteDoc(doc(database, "favorites", `${userId}_${productId}`));
+  } catch (error) {
+    console.error("Favori ürünü kaldırırken hata oluştu:", error);
+  }
+};
+
+export const useLoadFavorites = (userId, dispatch) => {
+  useEffect(() => {
+    if (!userId) return;
+
+    const q = query(favoritesRef, where("userId", "==", userId));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const favorites = snapshot.docs.map((doc) => doc.data().productId);
+      dispatch(setFavorites({ ids: favorites }));
+    });
+
+    return unsubscribe;
+  }, [userId, dispatch]);
+};
 
 
 export const addProduct = async (categoryName,title, description, price, imageUrl = "") => {
