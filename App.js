@@ -39,6 +39,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AddProducts from "./screens/AddProducts";
 import AddProducts2 from "./screens/AddProducts2";
 
+import UserProfileScreen from "./screens/UserProfileScreen";
+
 const Tab = createBottomTabNavigator();
 
 const AuthenticatedUserContext = createContext({});
@@ -179,7 +181,7 @@ function UserProfileStack() {
         contentStyle: { backgroundColor: "white" },
       }}
     >
-      <Stack.Screen name="UserProfile" component={ChatList} />
+      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
     </Stack.Navigator>
   );
 }

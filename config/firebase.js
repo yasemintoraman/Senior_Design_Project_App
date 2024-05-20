@@ -203,6 +203,32 @@ export const useLoadFavorites = (userId, dispatch) => {
   }, [userId, dispatch]);
 };
 
+export const useUserPosts = (email) => {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const fetchUserPosts = async () => {
+      try {
+        const q = query(collection(database, "products"), where("addedBy", "==", email));
+        const querySnapshot = await getDocs(q);
+        const userPosts = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setPosts(userPosts);
+      } catch (error) {
+        console.error("Kullanıcı postları getirilirken hata oluştu:", error);
+      }
+    };
+
+    if (email) {
+      fetchUserPosts();
+    }
+  }, [email]);
+
+  return posts;
+};
+
 
 export const addProduct = async (categoryName,title, description, price, imageUrl = "") => {
   try {
