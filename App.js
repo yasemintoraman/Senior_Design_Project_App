@@ -192,6 +192,7 @@ function UserProfileStack() {
           title: "About the Product",
         }}
       />
+      <Stack.Screen name="BackToLogin" component={Login}/>
     </Stack.Navigator>
   );
 }

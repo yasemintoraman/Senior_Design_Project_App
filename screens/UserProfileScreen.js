@@ -14,14 +14,26 @@ import { auth, useUserPosts } from "../config/firebase";
 import Ionic from "react-native-vector-icons/Ionicons";
 const width = Dimensions.get("window").width;
 import ProductItem2 from "../components/ProductsList/ProductItem2";
+import { signOut } from "firebase/auth";
 
 import ProductsList from "../components/ProductsList/ProductsList";
 
-
 import ProductDetails from "../components/ProductDetails";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
-const UserProfileScreen = ({ navigation }) => {
+import Login from "./Login";
+
+const UserProfileScreen = ({navigation}) => {
+
+  const onHandleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        console.log("Logout success");
+        navigation.navigate("BackToLogin");
+      })
+      .catch((err) => Alert.alert("Logout error", err.message));
+  };
+
   const [activeIndex, setActiveIndex] = useState(0);
   const tabClicked = (index) => {
     setActiveIndex(index);
@@ -57,7 +69,7 @@ const UserProfileScreen = ({ navigation }) => {
     return <ProductItem2 {...productItemProps} />;
   }
 
-  function pressHandler(productId){
+  function pressHandler(productId) {
     navigation.navigate("UserProductDetail", {
       productId: productId,
     });
@@ -82,8 +94,14 @@ const UserProfileScreen = ({ navigation }) => {
             <Text>Post</Text>
           </View>
           <View style={{ alignItems: "center" }}>
-            <Text>100</Text>
-            <Text>Following</Text>
+            <TouchableOpacity onPress={onHandleLogout}>
+              <Text
+                style={{ color: "#f57c00", fontWeight: "600", fontSize: 14 }}
+              >
+                {" "}
+                Logout
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -124,14 +142,17 @@ const UserProfileScreen = ({ navigation }) => {
         {activeIndex === 0 && (
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {userPosts.map((item) => (
-              <TouchableOpacity key={item.id} onPress={() => pressHandler(item.id)}>
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => pressHandler(item.id)}
+              >
                 <View
                   style={{
                     width: width / 3,
-                    height: width  / 3,
+                    height: width / 3,
                     marginBottom: 2,
                     marginTop: 2,
-                   // marginRight: 2,
+                    // marginRight: 2,
                   }}
                 >
                   <Image
@@ -140,7 +161,7 @@ const UserProfileScreen = ({ navigation }) => {
                       alignSelf: "stretch",
                       width: undefined,
                       height: undefined,
-                      borderRadius: 12
+                      borderRadius: 12,
                     }}
                     source={{ uri: item.imageUrl }}
                   />
@@ -175,7 +196,6 @@ const UserProfileScreen = ({ navigation }) => {
     </View>
   );
 };
-
 
 export default UserProfileScreen;
 const styles = StyleSheet.create({

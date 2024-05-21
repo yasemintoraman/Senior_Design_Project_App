@@ -20,6 +20,8 @@ import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
 import { addProduct } from "../config/firebase";
 
+import RNPickerSelect from 'react-native-picker-select';
+
 const AddProducts2 = () => {
   const [productName, setProductName] = useState("");
   const [productDesc, setProductDesc] = useState("");
@@ -127,6 +129,11 @@ const AddProducts2 = () => {
       console.error("Ürün kaydedilirken bir hata oluştu:", error);
     }
   };
+  const pickerItems = categories.map(category => ({
+    label: category.categoryName,
+    value: category.categoryName,
+  }));
+
 
   return (
     <View style={styles.container}>
@@ -178,18 +185,15 @@ const AddProducts2 = () => {
           setProductPrice(txt);
         }}
       />
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Select Category:</Text>
-      <Picker
-        style={{ height: 50, width: 200 }}
-        selectedValue={productCategory}
-        onValueChange={(itemValue) => setProductCategory(itemValue)}
-      >
-        <Picker.Item label="Select a category" value={""} />
-        {categories.map((category) => (
-          <Picker.Item key={category.categoryId} label={category.categoryName} value={category.categoryName} />
-        ))}
-      </Picker>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20, marginLeft: 50 } }>
+      <Text style={{marginBottom: 10, marginTop: -60}}>Select Category:</Text>
+      <RNPickerSelect
+        style={pickerSelectStyles}
+        onValueChange={setProductCategory}
+        items={pickerItems}
+        placeholder={{ label: "Select a category", value: "" }}
+        value={productCategory}
+        />
     </View>
 
       <TouchableOpacity
@@ -241,3 +245,31 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
+const pickerSelectStyles = {
+  inputIOS: {
+    fontSize: 14,
+    height: 50,
+    width: 300,
+    marginTop: 5,
+    alignItems:"center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30,
+  },
+  inputAndroid: {
+    fontSize: 14,
+    height: 50,
+    width: 300,
+    marginTop: -90,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30,
+  },
+};
