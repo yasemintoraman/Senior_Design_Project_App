@@ -12,11 +12,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 import IconButton from "../components/IconButton";
 import { addFavorite, removeFavorite, setFavorites } from "../store/redux/favorites";
-import { listProductDetailById, addFavoriteToFirestore, removeFavoriteFromFirestore, chatsRef, useUserEmail, auth } from "../config/firebase";
+import { listProductDetailById, addFavoriteToFirestore, removeFavoriteFromFirestore, chatsRef, useUserEmail, auth, database, useUserPosts } from "../config/firebase";
 
 import { useNavigation } from "@react-navigation/native";
 
-import { onSnapshot, addDoc, query, where, getDocs } from "firebase/firestore";
+import { onSnapshot, addDoc, query, where, getDocs, deleteDoc, doc, collection } from "firebase/firestore";
 
 const UserPostDetailScreen = ({ route, navigation }) => {
 
@@ -27,6 +27,9 @@ const UserPostDetailScreen = ({ route, navigation }) => {
 
   const [selectedProduct, setSelectedProduct] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState("");
+
+  const userPosts = useUserPosts(currentUserEmail);
+
 
   const userEmail = selectedProduct.addedBy;
 
@@ -53,81 +56,15 @@ const UserPostDetailScreen = ({ route, navigation }) => {
     return unsubscribe; // useEffect içinde fonksiyon dönerek, component kaldırıldığında dinleyiciyi kaldırıyoruz
   }, []);
 
-  //console.log(selectedProduct.addedBy);
 
-  const productIsFavorite = favoriteProductIds.includes(productId);
-
-
-  function changeFavoriteStatusHandler() {
-    if (productIsFavorite) {
-      dispatch(removeFavorite({ id: productId }));
-      removeFavoriteFromFirestore(currentUserEmail, productId);
-    } else {
-      dispatch(addFavorite({ id: productId }));
-      addFavoriteToFirestore(currentUserEmail, productId);
-    }
-  }
-
-  async function pressHandler() {
-    if (!currentUserEmail || !userEmail) return;
-
-    if (currentUserEmail === userEmail) {
-      console.error("Hata: Giriş yaptığınız e-posta ile alıcı e-posta aynı olamaz."); //bunu window haline getir!
-      return;
-    }
-  
+  const deletePostHandler = async () => {
     try {
-      // Kullanıcıları sıralayarak sorguyu oluştur
-      const sortedUsers = [currentUserEmail, userEmail].sort().join(',');
-      const chatQuery = query(
-        chatsRef,
-        where("users", "array-contains-any", [currentUserEmail, userEmail])
-      );
-      const chatSnapshot = await getDocs(chatQuery);
-  
-      let chatId = null;
-  
-      chatSnapshot.forEach(doc => {
-        const chatData = doc.data();
-        const chatUsers = chatData.users;
-        if (chatUsers.length === 2 && chatUsers.includes(currentUserEmail) && chatUsers.includes(userEmail)) {
-          // Tüm üyeler bu iki kullanıcıysa, chatId'yi güncelle ve döngüyü sonlandır
-          chatId = doc.id;
-          return;
-        }
-      });
-  
-      if (chatId) {
-        // Mevcut bir sohbet bulundu, Chat ekranını aç
-        navigation.navigate("Chat", { chatId });
-      } else {
-        // Mevcut bir sohbet yoksa yeni bir sohbet oluştur
-        const response = await addDoc(chatsRef, {
-          users: [currentUserEmail, userEmail], // Diziyi kullanıcıların e-postalarıyla oluştur
-        });
-        navigation.navigate("Chat", { chatId: response.id });
-      }
+      await deleteDoc(doc(database, "products", productId));
+      navigation.navigate("UserProfile");
     } catch (error) {
-      console.error("Sohbet işlemi sırasında bir hata oluştu:", error);
+      console.error("Post silinirken hata oluştu:", error);
     }
-  }
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <IconButton
-          icon={productIsFavorite ? "star" : "star-outline"}
-          color="white"
-          onPress={changeFavoriteStatusHandler}
-        />
-      ),
-    });
-  }, [navigation, changeFavoriteStatusHandler]);
-
-  console.log(selectedProduct.createdAt);
-
-  //let dateAdded = new Date(parsedFileContents.selectedProduct.createdAt[i].DateAdded + "T00:00:00");
-  //console.log(dateAdded);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -160,8 +97,8 @@ const UserPostDetailScreen = ({ route, navigation }) => {
         </Text>
         <Text style={styles.propertiesText}>Properties:{selectedProduct && selectedProduct.createdAt}</Text>
 
-        <TouchableOpacity style={styles.rentButton} onPress={pressHandler}>
-          <Text style={styles.rentButtonText}>Edit Post</Text>
+        <TouchableOpacity style={styles.rentButton} onPress={deletePostHandler}>
+          <Text style={styles.rentButtonText}>Delete Post</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

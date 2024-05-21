@@ -128,7 +128,7 @@ const UserProfileScreen = ({ navigation }) => {
                 <View
                   style={{
                     width: width / 3,
-                    height: width / 3,
+                    height: width  / 3,
                     marginBottom: 2,
                     marginTop: 2,
                    // marginRight: 2,

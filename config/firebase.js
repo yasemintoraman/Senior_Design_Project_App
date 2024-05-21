@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, setDoc, serverTimestamp} from "firebase/firestore";
+import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, setDoc, serverTimestamp, orderBy} from "firebase/firestore";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -42,7 +42,7 @@ const [products, setProducts] = useState([]);
     return onSnapshot(productsRef, snapshot => {
       const docs = snapshot.docs.map((doc) => {
         const data = doc.data()
-        return {id: doc.id, ...data, createdAt: data.createdAt?.toDate()};
+        return {id: doc.id, ...data, createdAt: data.createdAt?.toDate()}; //burada problem cikiyor
       });
 
       setProducts(docs);
@@ -207,23 +207,19 @@ export const useUserPosts = (email) => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    const fetchUserPosts = async () => {
-      try {
-        const q = query(collection(database, "products"), where("addedBy", "==", email));
-        const querySnapshot = await getDocs(q);
-        const userPosts = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setPosts(userPosts);
-      } catch (error) {
-        console.error("Kullanıcı postları getirilirken hata oluştu:", error);
-      }
-    };
+    if (!email) return;
 
-    if (email) {
-      fetchUserPosts();
-    }
+    //const q = query(collection(database, "products"), where("addedBy", "==", email), orderBy("createdAt", "desc"));
+    const q = query(collection(database, "products"), where("addedBy", "==", email));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const userPosts = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPosts(userPosts);
+    });
+
+    return () => unsubscribe(); // Cleanup için unsubscribe
   }, [email]);
 
   return posts;
@@ -263,6 +259,7 @@ export const addProduct = async (categoryName,title, description, price, imageUr
       price: price,
       title: title,
       uid: uid,
+      //createdAt: new Date(), bunu eklersem yukaridaki useProductListener'da hata aliyorum. düzeltmem lazim
     });
     await updateDoc(doc(productsRef, docRef.id), {id: docRef.id});
    // await updateDoc(doc(productsRef, docRef.id));
