@@ -8,6 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getStorage } from "firebase/storage";
 import { setFavorites } from "../store/redux/favorites";
 
+import { getFormatedDate } from "react-native-modern-datepicker";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyALUMbaHmGId7oy-ijuTjjD0tceIbOS0kc",
@@ -36,19 +38,28 @@ export const chatsRef = collection(database, "chats");
 const favoritesRef = collection(database, "favorites");
 
 export const useProductsListener = () => {
-const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     return onSnapshot(productsRef, snapshot => {
       const docs = snapshot.docs.map((doc) => {
-        const data = doc.data()
-        return {id: doc.id, ...data, createdAt: data.createdAt?.toDate()}; //burada problem cikiyor
+        const data = doc.data();
+        let createdAt;
+        
+        if (data.createdAt) {
+          const firebaseDate = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+          createdAt = getFormatedDate(firebaseDate.setDate(firebaseDate.getDate()), "YYYY/MM/DD");
+        } else {
+          createdAt = getFormatedDate(new Date(), "YYYY/MM/DD"); // Default to current date if createdAt is missing
+        }
+
+        return { id: doc.id, ...data, createdAt };
       });
 
       setProducts(docs);
     });
-
   }, []);
+
   return products;
 };
 
@@ -152,7 +163,7 @@ export const listProductsByCategory = async (categoryName) => {
   }
 };
 
-
+{/** 
 export const listProductDetailById = async(productId) => {
   try {
     const q = query(productsRef, where("id", "==", productId));
@@ -168,7 +179,32 @@ export const listProductDetailById = async(productId) => {
     console.error("Ürünleri getirirken hata oluştu:", error);
     throw error;
   }
-}
+}*/}
+
+export const listProductDetailById = async (productId) => {
+  try {
+    const q = query(productsRef, where("id", "==", productId));
+    const querySnapshot = await getDocs(q);
+    const productDetails = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      let createdAt;
+
+      if (data.createdAt) {
+        const firebaseDate = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+        createdAt = getFormatedDate(firebaseDate.setDate(firebaseDate.getDate()), "YYYY/MM/DD");
+      } else {
+        createdAt = getFormatedDate(new Date(), "YYYY/MM/DD"); // Default to current date if createdAt is missing
+      }
+      console.log(createdAt);
+      return { id: doc.id, ...data, createdAt };
+    });
+
+    return productDetails;
+  } catch (error) {
+    console.error("Ürünleri getirirken hata oluştu:", error);
+    throw error;
+  }
+};
 
 export const addFavoriteToFirestore = async (userId, productId) => {
   try {
@@ -209,8 +245,8 @@ export const useUserPosts = (email) => {
   useEffect(() => {
     if (!email) return;
 
-    //const q = query(collection(database, "products"), where("addedBy", "==", email), orderBy("createdAt", "desc"));
-    const q = query(collection(database, "products"), where("addedBy", "==", email));
+    const q = query(collection(database, "products"), where("addedBy", "==", email), orderBy("createdAt", "desc"));
+    //const q = query(collection(database, "products"), where("addedBy", "==", email));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const userPosts = querySnapshot.docs.map(doc => ({
         id: doc.id,
@@ -259,7 +295,7 @@ export const addProduct = async (categoryName,title, description, price, imageUr
       price: price,
       title: title,
       uid: uid,
-      //createdAt: new Date(), bunu eklersem yukaridaki useProductListener'da hata aliyorum. düzeltmem lazim
+      createdAt: new Date()// bunu eklersem yukaridaki useProductListener'da hata aliyorum. düzeltmem lazim
     });
     await updateDoc(doc(productsRef, docRef.id), {id: docRef.id});
    // await updateDoc(doc(productsRef, docRef.id));
