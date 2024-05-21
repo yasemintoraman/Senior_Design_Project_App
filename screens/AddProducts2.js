@@ -134,6 +134,17 @@ const AddProducts2 = () => {
     value: category.categoryName,
   }));
 
+  const resetForm = () => {
+    setProductName('');
+    setProductDesc('');
+    setProductPrice('');
+    setImageUrl('');
+    setProductCategory('');
+      setImageData({
+    assets: [{ uri: "" }],
+  });
+  };
+
 
   return (
     <View style={styles.container}>
@@ -200,6 +211,7 @@ const AddProducts2 = () => {
         style={styles.button}
         onPress={() => {
           saveProduct();
+          resetForm();
         }}
       >
         <Text style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}>

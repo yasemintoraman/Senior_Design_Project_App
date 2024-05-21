@@ -156,6 +156,7 @@ function AddProductStack() {
       }}
     >
       <Stack.Screen name="AddProduct" component={AddProducts2} />
+      <Stack.Screen name="AddedProductDetail" component={UserPostDetailScreen}/>
     </Stack.Navigator>
   );
 }
