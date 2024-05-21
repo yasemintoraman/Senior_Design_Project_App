@@ -13,13 +13,19 @@ import { Avatar } from "react-native-paper";
 import { auth, useUserPosts } from "../config/firebase";
 import Ionic from "react-native-vector-icons/Ionicons";
 const width = Dimensions.get("window").width;
+import ProductItem2 from "../components/ProductsList/ProductItem2";
 
-const UserProfileScreen = () => {
+import ProductsList from "../components/ProductsList/ProductsList";
+
+
+import ProductDetails from "../components/ProductDetails";
+import { useRoute } from "@react-navigation/native";
+
+const UserProfileScreen = ({ navigation }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const tabClicked = (index) => {
     setActiveIndex(index);
-
-  }
+  };
   const [currentUserEmail, setCurrentUserEmail] = useState("");
 
   const userPosts = useUserPosts(currentUserEmail);
@@ -39,10 +45,26 @@ const UserProfileScreen = () => {
     );
   }
 
-  async function pressHandler() {}
+  function renderProductItem(itemData) {
+    const item = itemData.item;
+
+    const productItemProps = {
+      id: item.id,
+      title: item.title,
+      imageUrl: item.imageUrl,
+      price: item.price,
+    };
+    return <ProductItem2 {...productItemProps} />;
+  }
+
+  function pressHandler(productId){
+    navigation.navigate("UserProductDetail", {
+      productId: productId,
+    });
+  }
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <View style={{ padding: 10 }}>
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1, alignItems: "center" }}>
@@ -76,58 +98,84 @@ const UserProfileScreen = () => {
           }}
         >
           <TouchableOpacity
-            style={styles.rentButton}
+            style={{ alignItems: "center" }}
             onPress={() => tabClicked(0)}
-            activeOpacity={activeIndex === 0}
+            activeOpacity={0.7}
           >
-            <Text>
-              <Ionic
-                name="apps-sharp"
-                size={30}
-                style={[activeIndex === 0 ? {} : { color: "gray" }]}
-              />
-            </Text>
+            <Ionic
+              name="apps-sharp"
+              size={30}
+              style={{ color: activeIndex === 0 ? "black" : "gray" }}
+            />
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.rentButton}
-            activeOpacity={activeIndex === 1}
-            //onPress={pressHandler}
+            style={{ alignItems: "center" }}
             onPress={() => tabClicked(1)}
+            activeOpacity={0.7}
           >
             <Ionic
               name="list-sharp"
               size={30}
-              style={[activeIndex === 1 ? {} : { color: "gray" }]}
+              style={{ color: activeIndex === 1 ? "black" : "gray" }}
             />
           </TouchableOpacity>
         </View>
-        {activeIndex === 1 && (
-            <FlatList>
-                <Text>Burayı Doldur</Text>
-            </FlatList>
-        )}
+
         {activeIndex === 0 && (
-          <View style={{flexDirection: "row", flexWrap: "wrap"}}>
-            {userPosts.map((item) => {
-                return (
-                    <TouchableOpacity>
-                    <View
-                    key={item.email}
-                    style={[{width: width / 3, height: width/3, marginBottom: 2, marginTop: 15}]}>
-
-                        <Image  style={{flex:1, alignSelf: "stretch", width: undefined, height:undefined}}
-                        source={{uri: item.imageUrl}}/>
-
-                        </View>
-                        </TouchableOpacity>
-                );
-            })}
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {userPosts.map((item) => (
+              <TouchableOpacity key={item.id} onPress={() => pressHandler(item.id)}>
+                <View
+                  style={{
+                    width: width / 3,
+                    height: width / 3,
+                    marginBottom: 2,
+                    marginTop: 2,
+                   // marginRight: 2,
+                  }}
+                >
+                  <Image
+                    style={{
+                      flex: 1,
+                      alignSelf: "stretch",
+                      width: undefined,
+                      height: undefined,
+                      borderRadius: 12
+                    }}
+                    source={{ uri: item.imageUrl }}
+                  />
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
+        )}
+
+        {activeIndex === 1 && ( //burasi düzenlenecek!! 21.05.24 (14:22)
+          <FlatList
+            data={userPosts}
+            numColumns={3}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View
+                style={{
+                  flex: 1,
+                  aspectRatio: 1,
+                  margin: 3,
+                }}
+              >
+                <Image
+                  source={{ uri: item.imageUrl }}
+                  style={{ width: "100%", height: "100%", borderRadius: 12 }}
+                />
+              </View>
+            )}
+          />
         )}
       </View>
     </View>
   );
 };
+
 
 export default UserProfileScreen;
 const styles = StyleSheet.create({
@@ -135,5 +183,9 @@ const styles = StyleSheet.create({
     marginTop: 30,
     height: 40,
     alignSelf: "center",
+  },
+  container: {
+    flex: 1,
+    padding: 16,
   },
 });

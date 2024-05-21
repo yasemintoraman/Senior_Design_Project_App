@@ -18,6 +18,9 @@ import ProductsOverviewScreen2 from "./screens/ProductsOverviewScreen2";
 import ProductsOverviewScreen3 from "./screens/ProductsOverviewScreen3";
 import ProductDetailScreen from "./screens/ProductDetailScreen";
 import FavoritesScreen from "./screens/FavoritesScreen";
+
+import UserPostDetailScreen from "./screens/UserPostDetailScreen";
+
 // import FavoritesContextProvider from "./store/context/favorites-context";
 import { store } from "./store/redux/store";
 const Stack = createNativeStackNavigator();
@@ -182,6 +185,13 @@ function UserProfileStack() {
       }}
     >
       <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+      <Stack.Screen
+        name="UserProductDetail"
+        component={UserPostDetailScreen}
+        options={{
+          title: "About the Product",
+        }}
+      />
     </Stack.Navigator>
   );
 }
