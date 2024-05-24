@@ -196,8 +196,7 @@ const AddProducts2 = () => {
           setProductPrice(txt);
         }}
       />
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20, marginLeft: 50 } }>
-      <Text style={{marginBottom: 10, marginTop: -60}}>Select Category:</Text>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 3 } }>
       <RNPickerSelect
         style={pickerSelectStyles}
         onValueChange={setProductCategory}
@@ -228,6 +227,9 @@ export default AddProducts2;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingVertical: 15
   },
   bannerView: {
     width: "90%",
@@ -241,11 +243,13 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#f57c00",
-    height: 58,
+    height: 48,
+    width: 250,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 20,
+    marginBottom: 12
   },
   camera: {
     width: 50,
@@ -260,16 +264,19 @@ const styles = StyleSheet.create({
 const pickerSelectStyles = {
   inputIOS: {
     fontSize: 14,
-    height: 50,
+    height: 40,
     width: 300,
     marginTop: 5,
     alignItems:"center",
     justifyContent: "center",
     borderWidth: 1,
     borderColor: 'gray',
-    borderRadius: 4,
+    borderRadius: 10,
     color: 'black',
-    paddingRight: 30,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    textAlign: "center",
+    //paddingRight: 30,
   },
   inputAndroid: {
     fontSize: 14,
@@ -280,8 +287,9 @@ const pickerSelectStyles = {
     paddingVertical: 8,
     borderWidth: 0.5,
     borderColor: 'purple',
-    borderRadius: 8,
+    borderRadius: 10,
     color: 'black',
     paddingRight: 30,
+    textAlign: "center"
   },
 };

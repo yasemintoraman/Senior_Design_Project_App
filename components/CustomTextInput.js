@@ -5,6 +5,7 @@ const CustomTextInput = ({ placeholder, value, onChangeText, type }) => {
   return (
     <View style={styles.input}>
       <TextInput
+      style={styles.text}
         placeholder={placeholder}
         value={value}
         keyboardType={type ? type : 'default'}
@@ -28,4 +29,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingLeft: 20,
   },
+  text: {
+    marginTop: 17,
+  }
 });
