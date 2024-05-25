@@ -7,26 +7,33 @@ import {
   PermissionsAndroid,
   Platform,
 } from "react-native";
+import {Picker} from '@react-native-picker/picker';
+
 import React, { useState } from "react";
 import CustomTextInput from "../components/CustomTextInput";
 
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
-import { storage } from "../config/firebase";
+import { storage, useCategoriesListener } from "../config/firebase";
 
-import {
-  ref,
-  getDownloadURL,
-  uploadBytes,
-} from "firebase/storage";
-import * as FileSystem from "expo-file-system";
+import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
 import { addProduct } from "../config/firebase";
+
+import RNPickerSelect from 'react-native-picker-select';
 
 const AddProducts = () => {
   const [productName, setProductName] = useState("");
   const [productDesc, setProductDesc] = useState("");
   const [productPrice, setProductPrice] = useState("");
+  const[productCategory, setProductCategory] = useState("");
+
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const categories = useCategoriesListener();
+
+  const selectCategory = (categoryId) => {
+    setSelectedCategory(categoryId);
+  };
 
   const [imageUrl, setImageUrl] = useState("");
   const [imageData, setImageData] = useState({
@@ -91,60 +98,53 @@ const AddProducts = () => {
     //console.log("Dosya adı:", imageData.assets[0].fileName);
     //const reference = storage().ref(imageData.assets[0].fileName);
     try {
-      if (!imageData.assets[0].uri) {
-        console.error("Dosya seçilmedi.");
-        return;
+      let imageUrl = "";
+
+      if (imageData.assets[0].uri) {
+        //console.error("Dosya seçilmedi.");
+        const uri = imageData.assets[0].uri;
+        const fileName = "file_" + Date.now(); // Zaman damgası kullanma: Dosyanın yüklendiği zamanı içeren bir zaman damgası kullanabilirsiniz. Bu, dosyaların sıralanmasına ve tanımlanmasına yardımcı olabilir.
+        const storageRef = ref(storage, fileName);
+  
+        const response = await fetch(uri);
+        const blob = await response.blob();
+  
+        await uploadBytes(storageRef, blob);
+  
+        // Dosyanın URL'sini alın
+        imageUrl = await getDownloadURL(storageRef);
+        console.log("Dosya URL'si:", imageUrl);
+
+        setImageUrl(imageUrl);
       }
 
-      const uri = imageData.assets[0].uri;
-      const fileName = "file_" + Date.now(); // Zaman damgası kullanma: Dosyanın yüklendiği zamanı içeren bir zaman damgası kullanabilirsiniz. Bu, dosyaların sıralanmasına ve tanımlanmasına yardımcı olabilir.
-      const storageRef = ref(storage, fileName);
-
-      const response = await fetch(uri);
-      const blob = await response.blob();
-
-      await uploadBytes(storageRef, blob);
-
-      // Dosyanın URL'sini alın
-      const imageUrl = await getDownloadURL(storageRef);
-      console.log("Dosya URL'si:", imageUrl);
-
-      setImageUrl(imageUrl);
-      addProduct(productName, productDesc, productPrice, imageUrl);
+      addProduct(
+        productCategory,
+        productName,
+        productDesc,
+        productPrice,
+        imageUrl,
+      );
     } catch (error) {
       console.error("Ürün kaydedilirken bir hata oluştu:", error);
     }
   };
+  const pickerItems = categories.map(category => ({
+    label: category.categoryName,
+    value: category.categoryName,
+  }));
 
-  {
-    /*   const url = await storage()
-      .ref(imageData.assets[0].fileName)
-      .getDownloadURL();
-    console.log(url);
-  } catch (error) {
-    console.error("Ürün kaydedilirken bir hata oluştu:", error);
-  }
+  const resetForm = () => {
+    setProductName('');
+    setProductDesc('');
+    setProductPrice('');
+    setImageUrl('');
+    setProductCategory('');
+      setImageData({
+    assets: [{ uri: "" }],
+  });
   };
-  */
-  }
 
-  {
-    /* const pickImage = async () => {
-    //No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };*/
-  }
 
   return (
     <View style={styles.container}>
@@ -175,7 +175,6 @@ const AddProducts = () => {
         )}
       </View>
       <CustomTextInput
-        
         placeholder={"Product Name"}
         value={productName}
         onChangeText={(txt) => {
@@ -197,10 +196,21 @@ const AddProducts = () => {
           setProductPrice(txt);
         }}
       />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 3 } }>
+      <RNPickerSelect
+        style={pickerSelectStyles}
+        onValueChange={setProductCategory}
+        items={pickerItems}
+        placeholder={{ label: "Select a category", value: "" }}
+        value={productCategory}
+        />
+    </View>
+
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
           saveProduct();
+          resetForm();
         }}
       >
         <Text style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}>
@@ -217,6 +227,9 @@ export default AddProducts;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingVertical: 15
   },
   bannerView: {
     width: "90%",
@@ -230,11 +243,13 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#f57c00",
-    height: 58,
+    height: 48,
+    width: 250,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 20,
+    marginBottom: 12
   },
   camera: {
     width: 50,
@@ -246,3 +261,35 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
+const pickerSelectStyles = {
+  inputIOS: {
+    fontSize: 14,
+    height: 40,
+    width: 300,
+    marginTop: 5,
+    alignItems:"center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 10,
+    color: 'black',
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    textAlign: "center",
+    //paddingRight: 30,
+  },
+  inputAndroid: {
+    fontSize: 14,
+    height: 50,
+    width: 300,
+    marginTop: -90,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+    borderRadius: 10,
+    color: 'black',
+    paddingRight: 30,
+    textAlign: "center"
+  },
+};

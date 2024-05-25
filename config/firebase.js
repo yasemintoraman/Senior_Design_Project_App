@@ -20,7 +20,6 @@ const firebaseConfig = {
   storageBucket: "sdpapp-5a06e.appspot.com",
   messagingSenderId: "384968976538",
   appId: "1:384968976538:web:bd8aa00837a3fe5812d723",
-  //databaseURL: Constants.manifest2.extra.databaseURL,
   databaseURL: "https://sdpapp-5a06e-default-rtdb.firebaseio.com/"
 };
 

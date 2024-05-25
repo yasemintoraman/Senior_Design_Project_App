@@ -13,7 +13,7 @@ import { Avatar } from "react-native-paper";
 import { auth, useUserPosts } from "../config/firebase";
 import Ionic from "react-native-vector-icons/Ionicons";
 const width = Dimensions.get("window").width;
-import ProductItem2 from "../components/ProductsList/ProductItem2";
+import ProductItem2 from "../components/ProductsList/ProductItem";
 import { signOut } from "firebase/auth";
 
 import ProductsList from "../components/ProductsList/ProductsList";

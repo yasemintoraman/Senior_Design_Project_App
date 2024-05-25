@@ -1,6 +1,6 @@
 import { View, FlatList, StyleSheet } from 'react-native';
 
-import ProductItem2 from './ProductItem2';
+import ProductItem from './ProductItem';
 import { useProductsListener } from '../../config/firebase';
 
 function ProductsList({items}) {
@@ -16,7 +16,7 @@ function ProductsList({items}) {
       imageUrl: item.imageUrl,
       price: item.price,
     };
-    return <ProductItem2 {...productItemProps} />;
+    return <ProductItem {...productItemProps} />;
   }
 
   return (

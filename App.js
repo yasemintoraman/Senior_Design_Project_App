@@ -3,7 +3,6 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, ActivityIndicator, View, Image, Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
 import { Provider, useDispatch } from "react-redux";
 
@@ -11,12 +10,8 @@ import Ionic from "react-native-vector-icons/Ionicons";
 
 import { PaperProvider } from "react-native-paper";
 
-//import { Provider } from "react-native-paper";
-
 import CategoriesScreen from "./screens/CategoriesScreen";
-import ProductsOverviewScreen2 from "./screens/ProductsOverviewScreen2";
-import ProductsOverviewScreen3 from "./screens/ProductsOverviewScreen3";
-import ProductDetailScreen from "./screens/ProductDetailScreen";
+import ProductsOverviewScreen from "./screens/ProductsOverviewScreen";
 import FavoritesScreen from "./screens/FavoritesScreen";
 
 import UserPostDetailScreen from "./screens/UserPostDetailScreen";
@@ -25,7 +20,6 @@ import EditProfile from "./screens/EditProfile";
 // import FavoritesContextProvider from "./store/context/favorites-context";
 import { store } from "./store/redux/store";
 const Stack = createNativeStackNavigator();
-const Drawer = createDrawerNavigator();
 
 import Login from "./screens/Login";
 import Signup from "./screens/Signup";
@@ -40,8 +34,8 @@ import InfoScreen from "./screens/InfoScreen";
 import { useProductsListener, useLoadFavorites, useUserEmail } from "./config/firebase";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
 import AddProducts from "./screens/AddProducts";
-import AddProducts2 from "./screens/AddProducts2";
 
 import UserProfileScreen from "./screens/UserProfileScreen";
 
@@ -57,52 +51,6 @@ const AuthenticatedUserProvider = ({ children }) => {
     </AuthenticatedUserContext.Provider>
   );
 };
-{/** 
-function DrawerNavigator() {
-  return (
-    <Drawer.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: "#ef9b47" },
-        headerTintColor: "white",
-        sceneContainerStyle: { backgroundColor: "#fdf5ed" },
-        drawerContentStyle: { backgroundColor: "#ef9b47" },
-        drawerInactiveTintColor: "white",
-        drawerActiveTintColor: "#351401",
-        drawerActiveBackgroundColor: "#e4baa1",
-      }}
-    >
-      <Drawer.Screen
-        name="Categories"
-        component={CategoriesScreen}
-        options={{
-          title: "All Categories",
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="list" color={color} size={size} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="Favorites"
-        component={FavoritesScreen}
-        options={{
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="star" color={color} size={size} />
-          ),
-        }}
-      />
-
-      <Drawer.Screen
-        name="AddProduct"
-        component={AddProducts2}
-        options={{
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="star" color={color} size={size} />
-          ),
-        }}
-      />
-    </Drawer.Navigator>
-  );
-}*/}
 
 function HomeStack() {
   return (
@@ -116,7 +64,7 @@ function HomeStack() {
       <Stack.Screen name="HomeCategories" component={CategoriesScreen} />
       <Stack.Screen
         name="ProductsOverview"
-        component={ProductsOverviewScreen2}
+        component={ProductsOverviewScreen}
       />
       <Stack.Screen
         name="ProductDetail"
@@ -156,7 +104,7 @@ function AddProductStack() {
         contentStyle: { backgroundColor: "white" },
       }}
     >
-      <Stack.Screen name="AddProduct" component={AddProducts2} />
+      <Stack.Screen name="AddProduct" component={AddProducts} />
       <Stack.Screen name="AddedProductDetail" component={UserPostDetailScreen}/>
     </Stack.Navigator>
   );
