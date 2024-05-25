@@ -10,6 +10,8 @@ import { setFavorites } from "../store/redux/favorites";
 
 import { getFormatedDate } from "react-native-modern-datepicker";
 
+import * as Location from 'expo-location';
+import Geocoder from 'react-native-geocoding';
 
 const firebaseConfig = {
   apiKey: "AIzaSyALUMbaHmGId7oy-ijuTjjD0tceIbOS0kc",
@@ -285,6 +287,82 @@ export const addProduct = async (categoryName,title, description, price, imageUr
     
         const userProfile = querySnapshot.docs[0].data();
 
+{/*
+            // Get the user's current location
+    let location;
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        throw new Error('Location permission not granted');
+      }
+
+      const currentLoc = await Location.getCurrentPositionAsync({});
+      location = {
+        latitude: currentLoc.coords.latitude,
+        longitude: currentLoc.coords.longitude,
+      };
+    } catch (locationError) {
+      console.error('Location could not be fetched:', locationError);
+      location = null; // You can handle this case as needed
+    }
+    */}
+
+
+     // Kullanıcının konumunu al
+     let location;
+     try {
+       const { status } = await Location.requestForegroundPermissionsAsync();
+       if (status !== 'granted') {
+         throw new Error('Location permission not granted');
+       }
+ 
+       const currentLoc = await Location.getCurrentPositionAsync({});
+       location = {
+         latitude: currentLoc.coords.latitude,
+         longitude: currentLoc.coords.longitude,
+       };
+     } catch (locationError) {
+       console.error('Location could not be fetched:', locationError);
+       throw new Error('Konum alınamadı.');
+     }
+ 
+
+// Bu kısmı projenize uygun bir şekilde güncelleyin.
+Geocoder.init("AIzaSyApwDwWPHsOWRBRta-skLJhuNAWLLVMjAM");
+
+// Kullanıcının konumunu adres bilgisine dönüştürme
+const convertCoordinatesToAddress = async (latitude, longitude) => {
+  {/**
+  try {
+    const res = await Geocoder.from(latitude, longitude);
+    const address = res.results[0].formatted_address;
+    return address;
+  } catch (error) {
+    console.error('Konum adres bilgisine çevrilemedi:', error);
+    throw error;
+  }
+};
+ */}
+ 
+ try {
+  const res = await Geocoder.from(latitude, longitude);
+  const address = res.results[0].address_components;
+  console.log(address)
+  const formattedAddress = `${address[2].long_name}, ${address[3].long_name}/${address[4].long_name}, ${address[5].long_name}`;
+  return formattedAddress;
+} catch (error) {
+  console.error('Konum adres bilgisine çevrilemedi:', error);
+  throw new Error('Konum adres bilgisine çevrilemedi.');
+}
+};
+
+// addProduct fonksiyonu içinde kullanım örneği
+const locationAddress = await convertCoordinatesToAddress(location.latitude, location.longitude);
+console.log('Kullanıcının konumu:', locationAddress);
+
+    
+
+
     const productsRef = collection(database, 'products');
     const docRef = await addDoc(productsRef, {
       //addedBy: userProfile.userName,
@@ -295,7 +373,8 @@ export const addProduct = async (categoryName,title, description, price, imageUr
       price: price,
       title: title,
       uid: uid,
-      createdAt: new Date()// bunu eklersem yukaridaki useProductListener'da hata aliyorum. düzeltmem lazim
+      createdAt: new Date(),// bunu eklersem yukaridaki useProductListener'da hata aliyorum. düzeltmem lazim
+      location: locationAddress,
     });
     await updateDoc(doc(productsRef, docRef.id), {id: docRef.id});
    // await updateDoc(doc(productsRef, docRef.id));
