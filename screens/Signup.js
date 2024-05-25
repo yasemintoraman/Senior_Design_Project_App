@@ -74,7 +74,7 @@ export default function Signup({ navigation }) {
           autoCapitalize="characters"
           keyboardType="ascii-capable"
           textContentType="name"
-          autoFocus={true}
+          
           value={name}
           onChangeText={(text) => setName(text)}
         />
@@ -84,7 +84,7 @@ export default function Signup({ navigation }) {
           autoCapitalize="characters"
           keyboardType="ascii-capable"
           textContentType="surname"
-          autoFocus={true}
+          
           value={surname}
           onChangeText={(text) => setSurname(text)}
         />
@@ -94,7 +94,7 @@ export default function Signup({ navigation }) {
           autoCapitalize="none"
           keyboardType="email-address"
           textContentType="emailAddress"
-          autoFocus={true}
+          
           value={email}
           onChangeText={(text) => setEmail(text)}
         />
