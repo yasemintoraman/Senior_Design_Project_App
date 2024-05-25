@@ -23,6 +23,8 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 
 import Login from "./Login";
 
+import EditProfile from "./EditProfile";
+
 const UserProfileScreen = ({navigation}) => {
 
   const onHandleLogout = () => {
@@ -68,6 +70,10 @@ const UserProfileScreen = ({navigation}) => {
     };
     return <ProductItem2 {...productItemProps} />;
   }
+  
+  function editPressHandler() {
+    navigation.navigate("EditProfile");
+  }
 
   function pressHandler(productId) {
     navigation.navigate("UserProductDetail", {
@@ -91,7 +97,9 @@ const UserProfileScreen = ({navigation}) => {
             <Text>Post</Text>
           </View>
           <View style={{ alignItems: "center" }}>
-            <Text>Post</Text>
+            <TouchableOpacity onPress={editPressHandler}>
+            <Text style={{ color: "#f57c00", fontWeight: "600", fontSize: 14 }}>Post</Text>
+            </TouchableOpacity>
           </View>
           <View style={{ alignItems: "center" }}>
             <TouchableOpacity onPress={onHandleLogout}>

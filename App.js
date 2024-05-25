@@ -20,6 +20,7 @@ import ProductDetailScreen from "./screens/ProductDetailScreen";
 import FavoritesScreen from "./screens/FavoritesScreen";
 
 import UserPostDetailScreen from "./screens/UserPostDetailScreen";
+import EditProfile from "./screens/EditProfile";
 
 // import FavoritesContextProvider from "./store/context/favorites-context";
 import { store } from "./store/redux/store";
@@ -194,6 +195,7 @@ function UserProfileStack() {
         }}
       />
       <Stack.Screen name="BackToLogin" component={Login}/>
+      <Stack.Screen name="EditProfile" component={EditProfile}/>
     </Stack.Navigator>
   );
 }
