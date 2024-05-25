@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, ScrollView, Pressable, BackHandler, Alert, ActivityIndicator } from "react-native";
+import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, ScrollView, Alert, ActivityIndicator } from "react-native";
 import { List, Avatar, Divider, FAB, Portal, Dialog, Button, TextInput } from "react-native-paper";
 import { useNavigation } from '@react-navigation/native';
 import { onSnapshot, addDoc, query, where, getDocs, collection, doc, setDoc, deleteDoc } from 'firebase/firestore';
@@ -31,7 +31,6 @@ const ChatList = () => {
     }, [email]);
 
     useEffect(() => {
-        // DELETE BUTTON 
         if (selectedItems.length > 0) {
             navigation.setOptions({
                 headerRight: () => (
@@ -134,17 +133,40 @@ const ChatList = () => {
         );
     }
 
+    const validateEmail = (email) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    };
+
     async function pressHandler() {
         if (!email || !userEmail) return;
         setIsLoading(true);
 
         if (email === userEmail) {
-            console.error("Hata: Giriş yaptığınız e-posta ile alıcı e-posta aynı olamaz.");
+            console.error("Error: The entered email cannot be the same as the logged-in email.");
+            Alert.alert("Error", "The entered email cannot be the same as the logged-in email.");
+            setIsLoading(false);
+            return;
+        }
+
+        if (!validateEmail(userEmail)) {
+            console.error("Error: The entered email is not in a valid format.");
+            Alert.alert("Error", "The entered email is not in a valid format.");
             setIsLoading(false);
             return;
         }
 
         try {
+            const userQuery = query(collection(database, 'users'), where("email", "==", userEmail));
+            const userSnapshot = await getDocs(userQuery);
+
+            if (userSnapshot.empty) {
+                console.error("Error: The entered email is not registered in the system.");
+                Alert.alert("Error", "The entered email is not registered in the system.");
+                setIsLoading(false);
+                return;
+            }
+
             const sortedUsers = [email, userEmail].sort().join(',');
             const chatQuery = query(
                 chatsRef,
@@ -166,6 +188,7 @@ const ChatList = () => {
             if (chatId) {
                 setIsLoading(false);
                 setIsDialogVisible(false);
+                setUserEmail("");
                 navigation.navigate("Chat", { chatId });
             } else {
                 const response = await addDoc(chatsRef, {
@@ -173,10 +196,11 @@ const ChatList = () => {
                 });
                 setIsLoading(false);
                 setIsDialogVisible(false);
+                setUserEmail("");
                 navigation.navigate("Chat", { chatId: response.id });
             }
         } catch (error) {
-            console.error("Sohbet işlemi sırasında bir hata oluştu:", error);
+            console.error("An error occurred during the chat process:", error);
             setIsLoading(false);
         }
     }
@@ -208,7 +232,7 @@ const ChatList = () => {
                                 <Divider inset />
                             </React.Fragment>
                         ))}
-                  
+
                         <View style={styles.blankContainer}>
                             <Text style={{ fontSize: 12, fontWeight: 400, marginRight: 15, marginLeft: -30, marginTop: 15, marginBottom: 90 }}>
                                 <Ionicons name="lock-open" size={12} style={{ color: '#565656' }} />
@@ -225,7 +249,9 @@ const ChatList = () => {
             <Portal>
                 <Dialog
                     visible={isDialogVisible}
-                    onDismiss={() => setIsDialogVisible(false)}
+                    onDismiss={() => {setIsDialogVisible(false); 
+                        setUserEmail("");
+                    }}
                 >
                     <Dialog.Title>New Chat</Dialog.Title>
                     <Dialog.Content>
@@ -236,7 +262,10 @@ const ChatList = () => {
                         />
                     </Dialog.Content>
                     <Dialog.Actions>
-                        <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
+                        <Button onPress={() => {
+                            setIsDialogVisible(false);
+                            setUserEmail("");
+                        }}>Cancel</Button>
                         <Button onPress={pressHandler} loading={isLoading}>
                             Save
                         </Button>
