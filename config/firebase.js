@@ -36,6 +36,8 @@ const categoriesRef = collection(database, "categories");
 
 export const chatsRef = collection(database, "chats");
 
+export const usersRef = collection(database, "users");
+
 const favoritesRef = collection(database, "favorites");
 
 export const useProductsListener = () => {
@@ -192,9 +194,9 @@ export const listProductDetailById = async (productId) => {
 
       if (data.createdAt) {
         const firebaseDate = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
-        createdAt = getFormatedDate(firebaseDate.setDate(firebaseDate.getDate()), "YYYY/MM/DD");
+        createdAt = getFormatedDate(firebaseDate.setDate(firebaseDate.getDate()), "DD/MM/YYYY");
       } else {
-        createdAt = getFormatedDate(new Date(), "YYYY/MM/DD"); // Default to current date if createdAt is missing
+        createdAt = getFormatedDate(new Date(), "DD/MM/YYYY"); // Default to current date if createdAt is missing
       }
       console.log(createdAt);
       return { id: doc.id, ...data, createdAt };

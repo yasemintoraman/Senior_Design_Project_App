@@ -6,20 +6,33 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ScrollView,
 } from "react-native";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import IconButton from "../components/IconButton";
-import { addFavorite, removeFavorite, setFavorites } from "../store/redux/favorites";
-import { listProductDetailById, addFavoriteToFirestore, removeFavoriteFromFirestore, chatsRef, useUserEmail, auth } from "../config/firebase";
+import {
+  addFavorite,
+  removeFavorite,
+  setFavorites,
+} from "../store/redux/favorites";
+import {
+  listProductDetailById,
+  addFavoriteToFirestore,
+  removeFavoriteFromFirestore,
+  chatsRef,
+  useUserEmail,
+  usersRef,
+  auth,
+} from "../config/firebase";
 
 import { useNavigation } from "@react-navigation/native";
 
-import { onSnapshot, addDoc, query, where, getDocs } from "firebase/firestore";
+import { onSnapshot, addDoc, query, where, getDocs, doc, getDoc} from "firebase/firestore";
+import Ionic from "react-native-vector-icons/Ionicons";
 
 const InfoScreen = ({ route, navigation }) => {
-
   const favoriteProductIds = useSelector((state) => state.favoriteProducts.ids);
   const dispatch = useDispatch();
 
@@ -27,6 +40,7 @@ const InfoScreen = ({ route, navigation }) => {
 
   const [selectedProduct, setSelectedProduct] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState("");
+  const [userDetails, setUserDetails] = useState({ name: "", surname: "" });
 
   const userEmail = selectedProduct.addedBy;
 
@@ -55,8 +69,34 @@ const InfoScreen = ({ route, navigation }) => {
 
   //console.log(selectedProduct.addedBy);
 
-  const productIsFavorite = favoriteProductIds.includes(productId);
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (userEmail) {
+        try {
+          console.log("Fetching details for email:", userEmail); // Log email
 
+          const userDocRef = query(usersRef, where("email", "==", userEmail));
+          const querySnapshot = await getDocs(userDocRef);
+
+          querySnapshot.forEach((doc) => {
+            if (doc.exists()) {
+              console.log("User data:", doc.data()); // Log user data
+              setUserDetails(doc.data());
+            } else {
+              console.log("No such document!");
+            }
+          });
+        } catch (error) {
+          console.error("Kullanıcı bilgilerini getirirken hata oluştu:", error);
+        }
+      }
+    };
+
+    fetchUserDetails();
+  }, [userEmail]);
+
+
+  const productIsFavorite = favoriteProductIds.includes(productId);
 
   function changeFavoriteStatusHandler() {
     if (productIsFavorite) {
@@ -72,31 +112,37 @@ const InfoScreen = ({ route, navigation }) => {
     if (!currentUserEmail || !userEmail) return;
 
     if (currentUserEmail === userEmail) {
-      console.error("Hata: Giriş yaptığınız e-posta ile alıcı e-posta aynı olamaz."); //bunu window haline getir!
+      console.error(
+        "Hata: Giriş yaptığınız e-posta ile alıcı e-posta aynı olamaz."
+      ); //bunu window haline getir!
       return;
     }
-  
+
     try {
       // Kullanıcıları sıralayarak sorguyu oluştur
-      const sortedUsers = [currentUserEmail, userEmail].sort().join(',');
+      const sortedUsers = [currentUserEmail, userEmail].sort().join(",");
       const chatQuery = query(
         chatsRef,
         where("users", "array-contains-any", [currentUserEmail, userEmail])
       );
       const chatSnapshot = await getDocs(chatQuery);
-  
+
       let chatId = null;
-  
-      chatSnapshot.forEach(doc => {
+
+      chatSnapshot.forEach((doc) => {
         const chatData = doc.data();
         const chatUsers = chatData.users;
-        if (chatUsers.length === 2 && chatUsers.includes(currentUserEmail) && chatUsers.includes(userEmail)) {
+        if (
+          chatUsers.length === 2 &&
+          chatUsers.includes(currentUserEmail) &&
+          chatUsers.includes(userEmail)
+        ) {
           // Tüm üyeler bu iki kullanıcıysa, chatId'yi güncelle ve döngüyü sonlandır
           chatId = doc.id;
           return;
         }
       });
-  
+
       if (chatId) {
         // Mevcut bir sohbet bulundu, Chat ekranını aç
         navigation.navigate("Chat", { chatId });
@@ -131,39 +177,65 @@ const InfoScreen = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-    <View style={styles.container}>
-      {selectedProduct && selectedProduct.imageUrl && (
-        <View style={styles.imageSection}>
-          <Image
-            source={{ uri: selectedProduct.imageUrl }}
-            resizeMode="contain"
-            style={styles.productImage}
-          />
-        </View>
-      )}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          {selectedProduct && selectedProduct.imageUrl && (
+            <View style={styles.imageSection}>
+              <Image
+                source={{ uri: selectedProduct.imageUrl }}
+                style={styles.productImage}
+              />
+                          <Text style={styles.addedByText}>
+              {userDetails.name} {userDetails.surname} & {selectedProduct.addedBy}
+            </Text>
+            <Text style={styles.dateText}>
+              {selectedProduct && selectedProduct.createdAt}
+            </Text>
+              {/** 
+              <View style={styles.addedByContainer}>
+              <Ionic name="person-outline" size={18}  />
+            <Text style={styles.addedByText}>
+              {userDetails.name} {userDetails.surname} & {selectedProduct.addedBy}
+            </Text>
+            </View>*/}
+            </View>
+          )}
+          <View>
+            <View style={styles.headSection}>
+              <View style={styles.topTextArea}>
+                <Text style={styles.title}>
+                  {selectedProduct && selectedProduct.title}
+                </Text>
+                <Text style={styles.price}>
+                  <Text style={styles.amount}>
+                    ${selectedProduct && selectedProduct.price}
+                  </Text>
+                </Text>
+              </View>
+              {selectedProduct && selectedProduct.location && (
+                <View style={styles.locationContainer}>
+                  <Ionic name="location" size={18} color="#f57c00" />
+                  <Text style={styles.locationText}>{selectedProduct.location}</Text>
+                </View>
+              )}
+            </View>
 
-        <View style={styles.headSection}>
-          <View style={styles.topTextArea}>
-            <Text style={styles.makemodelText}>
-              {selectedProduct && selectedProduct.title}
+            <Text style={styles.descriptionText}>
+              {selectedProduct && selectedProduct.description}
             </Text>
-            <Text style={styles.price}>
-              <Text style={styles.amount}>
-                ${selectedProduct && selectedProduct.price}
-              </Text>
-            </Text>
+
+            <View style={{ alignItems: "center" }}>
+              <TouchableOpacity style={styles.button} onPress={pressHandler}>
+                <Text
+                  style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}
+                >
+                  Send Message
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-
-        <Text style={styles.descriptionText}>
-          {selectedProduct && selectedProduct.description}
-        </Text>
-        <Text style={styles.propertiesText}>Properties:{selectedProduct && selectedProduct.createdAt}</Text>
-
-        <TouchableOpacity style={styles.rentButton} onPress={pressHandler}>
-          <Text style={styles.rentButtonText}>Send Message</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -175,10 +247,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fdf5ed",
   },
+  price: {
+    fontWeight: "600",
+    fontSize: 17,
+  },
   container: {
     flex: 1,
-    paddingRight: 35,
-    paddingLeft: 35,
+    paddingRight: 10,
+    paddingLeft: 10,
+  }, 
+  dateText: {
+    marginTop: 5,
+    fontSize: 16,
+    fontWeight: "500",
   },
   headerSection: {
     height: 70,
@@ -186,40 +267,54 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  menuIconStyle: {
-    width: 25,
-  },
   HeaderText: {
-    fontSize: 20,
+    fontSize: 15,
     marginLeft: 5,
     fontWeight: "500",
   },
-  faceIconStyle: {
-    width: 30,
+  locationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
   },
-
+  addedByContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  locationText: {
+    fontSize: 16,
+    color: "black",
+    
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingHorizontal: 35,
+  },
   imageSection: {
     width: "100%",
-    height: 350,
+    height: 300,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 22
   },
   productImage: {
-    width: "100%",
-    height: "100%",
+    width: 300,
+    height: 300,
+    aspectRatio: 1,
   },
 
   headSection: {
-    marginTop: 20,
+    marginTop: 30,
   },
   topTextArea: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  makemodelText: {
-    fontSize: 20,
-    lineHeight: 18,
-    color: "#696969",
+  title: {
+    fontSize: 26,
+    lineHeight: 30,
+    color: "black",
     fontWeight: "500",
   },
   propertiesText: {
@@ -232,30 +327,49 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
   },
-  level: {
-    marginRight: 30,
+  addedByText: {
+    marginTop: 5,
+    marginLeft: 5,
+    fontSize: 16,
+    color: "black",
+    justifyContent:"center",
+    //fontWeight: "500",
   },
   propertyText: {
-    fontSize: 12,
-    color: "#696969",
+    fontSize: 18,
+    color: "black",
+    marginTop: 5
   },
   valueText: {
     fontSize: 12,
     color: "black",
   },
-  rentButton: {
-    marginTop: 50,
-    height: 40,
-    // padding: 10,
-    alignSelf: "center",
+  descriptionText: {
+    marginTop: 15,
+    fontSize: 15,
+    letterSpacing: 0.5,
+    color: "#696969",
+    fontWeight: "500",
+    marginLeft: 10,
+    marginRight: 10
+  },
+  button: {
+    backgroundColor: "#f57c00",
+    height: 48,
     width: 250,
-    backgroundColor: "black",
-    borderRadius: 8,
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 40,
+    marginBottom: 12,
   },
-  rentButtonText: {
-    color: "white",
-    fontWeight: "500",
+  textContainer: {
+    flex: 1,
+    width: "100%",
+    height: "45%",
+    position: "center",
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 60,
+    borderTopRightRadius: 60,
   },
 });
