@@ -206,7 +206,7 @@ const ChatList = () => {
     }
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1 , backgroundColor: "#fdf5ed"}}>
             {loading ? (
                 <ActivityIndicator size='large' style={styles.loadingContainer} />
             ) : (

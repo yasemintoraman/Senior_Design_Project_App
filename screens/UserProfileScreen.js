@@ -82,7 +82,7 @@ const UserProfileScreen = ({navigation}) => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: "#fdf5ed"}}>
       <View style={{ padding: 10 }}>
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1, alignItems: "center" }}>
@@ -215,5 +215,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+   
   },
 });
