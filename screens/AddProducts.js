@@ -229,7 +229,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingVertical: 15
+    paddingVertical: 15,
+    backgroundColor :"#fdf5ed",
   },
   bannerView: {
     width: "90%",

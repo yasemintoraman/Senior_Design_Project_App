@@ -5,9 +5,10 @@ import {
   StyleSheet,
   Platform,
   Image,
+  Dimensions
 } from "react-native";
+const width = Dimensions.get("window").width;
 function CategoryGridTile({ name, imageUrl, onPress }) {
-  //required props
   return (
     <View style={styles.outer}>
       <View style={styles.gridItem}>
@@ -56,6 +57,8 @@ const styles = StyleSheet.create({
     margin: 8,
     marginTop: 10,
     height: 155,
+    width: (width - 28) / 2,
+    marginLeft: 7,
     borderRadius: 8,
     elevation: 4, //for android
     backgroundColor: "#e2eae3", //for ios
