@@ -77,7 +77,7 @@ function ProductsOverviewScreen({ route, navigation }) {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor:"#FDF5ED" }}>
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -86,7 +86,7 @@ function ProductsOverviewScreen({ route, navigation }) {
           onChangeText={setSearchQuery}
         />
         <TouchableOpacity onPress={() => setPickerVisible(true)}>
-          <Ionicons name="options" size={24} color="black" />
+          <Ionicons name="options" size={24} color="black" style={{paddingLeft: 10}}/>
         </TouchableOpacity>
       </View>
 
@@ -147,6 +147,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     margin: 16,
+    marginBottom: 3,
+    paddingLeft: 7,
+    paddingRight: 8
+
   },
   searchInput: {
     flex: 1,
@@ -164,7 +168,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '80%',
-    backgroundColor: 'white',
+    backgroundColor: '#FDF5ED',
     borderRadius: 8,
     padding: 16,
   },

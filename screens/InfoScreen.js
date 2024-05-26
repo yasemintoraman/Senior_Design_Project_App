@@ -173,7 +173,7 @@ export default InfoScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#fdf5ed",
   },
   container: {
     flex: 1,
