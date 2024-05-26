@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
         borderRadius: 28,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: "orange"
+        backgroundColor: "#B39DDB"
     },
     avatarLabel: {
         fontSize: 20,

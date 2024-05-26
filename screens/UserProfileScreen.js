@@ -8,6 +8,7 @@ import {
   Image,
   TouchableOpacity,
   Text,
+  ScrollView
 } from "react-native";
 import { Avatar } from "react-native-paper";
 import { auth, useUserPosts } from "../config/firebase";
@@ -19,7 +20,7 @@ import { signOut } from "firebase/auth";
 import ProductsList from "../components/ProductsList/ProductsList";
 
 import ProductDetails from "../components/ProductDetails";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
 
 import Login from "./Login";
 
@@ -31,7 +32,6 @@ const UserProfileScreen = ({navigation}) => {
     signOut(auth)
       .then(() => {
         console.log("Logout success");
-        navigation.navigate("BackToLogin");
       })
       .catch((err) => Alert.alert("Logout error", err.message));
   };
@@ -41,15 +41,24 @@ const UserProfileScreen = ({navigation}) => {
     setActiveIndex(index);
   };
   const [currentUserEmail, setCurrentUserEmail] = useState("");
+  const [currentUserNameSurname, setCurrentUserNameSurname] = useState("");
 
   const userPosts = useUserPosts(currentUserEmail);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setCurrentUserEmail(user?.email ?? ""); // Eğer kullanıcı oturum açık değilse null dönecek
+      setCurrentUserNameSurname(user?.displayName ?? "");
     });
     return unsubscribe; // useEffect içinde fonksiyon dönerek, component kaldırıldığında dinleyiciyi kaldırıyoruz
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setCurrentUserEmail(auth.currentUser?.email ?? "");
+      setCurrentUserNameSurname(auth.currentUser?.displayName ?? "");
+    }, [])
+  );
 
   if (currentUserEmail === "") {
     return (
@@ -83,36 +92,33 @@ const UserProfileScreen = ({navigation}) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fdf5ed"}}>
-      <View style={{ padding: 10 }}>
+      <View style={{ padding: 10}}>
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1, alignItems: "center" }}>
-            <Avatar.Text label={currentUserEmail[0].toUpperCase()} size={100} />
+            <Avatar.Text label={currentUserNameSurname ? currentUserNameSurname[0].toUpperCase() : ""} size={80} style={{backgroundColor: "#E0E0E0"}} />
+            <Text style={{fontSize: 20, paddingTop: 3, color: "gray"}}>{currentUserNameSurname}</Text>
           </View>
         </View>
       </View>
       <View>
-        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-          <View style={{ alignItems: "center" }}>
-            <Text>100</Text>
-            <Text>Post</Text>
-          </View>
-          <View style={{ alignItems: "center" }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-around", paddingBottom:10 }}>
+          <View style={{ alignItems: "center", paddingLeft:10, }}>
             <TouchableOpacity onPress={editPressHandler}>
-            <Text style={{ color: "#f57c00", fontWeight: "600", fontSize: 14 }}>Post</Text>
+            <Text style={{ color: "#f57c00", fontWeight: "600", fontSize: 18, marginRight:-80 }}>Edit Profile</Text>
             </TouchableOpacity>
           </View>
           <View style={{ alignItems: "center" }}>
             <TouchableOpacity onPress={onHandleLogout}>
               <Text
-                style={{ color: "#f57c00", fontWeight: "600", fontSize: 14 }}
+                style={{ color: "#f57c00", fontWeight: "600", fontSize: 18 }}
               >
-                {" "}
                 Logout
               </Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
+      {/** */}
       <View style={{ flex: 1 }}>
         <View
           style={{
@@ -120,9 +126,9 @@ const UserProfileScreen = ({navigation}) => {
             justifyContent: "space-around",
             borderTopWidth: 1,
             borderTopColor: "#ccc",
-            paddingVertical: 10,
+            paddingVertical: 8,
           }}
-        >
+        >{/** 
           <TouchableOpacity
             style={{ alignItems: "center" }}
             onPress={() => tabClicked(0)}
@@ -144,77 +150,73 @@ const UserProfileScreen = ({navigation}) => {
               size={30}
               style={{ color: activeIndex === 1 ? "black" : "gray" }}
             />
-          </TouchableOpacity>
+          </TouchableOpacity>*/}
         </View>
 
-        {activeIndex === 0 && (
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            {userPosts.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                onPress={() => pressHandler(item.id)}
+      
+          <FlatList
+          data={userPosts}
+          numColumns={3}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              key={item.id}
+              onPress={() => pressHandler(item.id)}
+            >
+              <View
+                style={{
+                  width: (width - 10) / 3,
+                  height: (width - 10) / 3,
+                  marginBottom: 2,
+                  marginTop: 2,
+                  paddingRight: 3,
+                  marginRight: 4,
+                }}
               >
-                <View
+                <Image
                   style={{
-                    width: width / 3,
-                    height: width / 3,
-                    marginBottom: 2,
-                    marginTop: 2,
-                    // marginRight: 2,
+                    flex: 1,
+                    alignSelf: "stretch",
+                    width: undefined,
+                    height: undefined,
+                    borderRadius: 12,
                   }}
-                >
-                  <Image
-                    style={{
-                      flex: 1,
-                      alignSelf: "stretch",
-                      width: undefined,
-                      height: undefined,
-                      borderRadius: 12,
-                    }}
-                    source={{ uri: item.imageUrl }}
-                  />
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-
+                  source={item.imageUrl ? { uri: item.imageUrl } : require("../assets/image_not_found.jpg")}
+                />
+              </View>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id.toString()}
+        />
+        
+{/** 
         {activeIndex === 1 && ( //burasi düzenlenecek!! 21.05.24 (14:22)
           <FlatList
             data={userPosts}
-            numColumns={3}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <View
                 style={{
                   flex: 1,
-                  aspectRatio: 1,
-                  margin: 3,
+                  aspectRatio: 3 / 1,
+                  marginVertical: 3,
+                  padding: 3,
+                  marginLeft: 3,
+                  marginRight: 6
                 }}
               >
                 <Image
-                  source={{ uri: item.imageUrl }}
+                 source={item.imageUrl ? { uri: item.imageUrl } : require("../assets/image_not_found.jpg")}
                   style={{ width: "100%", height: "100%", borderRadius: 12 }}
                 />
               </View>
             )}
           />
         )}
+        */}
       </View>
     </View>
   );
 };
 
 export default UserProfileScreen;
-const styles = StyleSheet.create({
-  rentButton: {
-    marginTop: 30,
-    height: 40,
-    alignSelf: "center",
-  },
-  container: {
-    flex: 1,
-    padding: 16,
-   
-  },
-});
+

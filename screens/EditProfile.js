@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
+  Alert
 } from "react-native";
 import {
   auth,
@@ -111,10 +112,21 @@ export default function EditProfile({ navigation }) {
           displayName: `${name} ${surname}`,
         });
 
-        alert("User profile updated successfully");
+        Alert.alert(
+          "Success",
+          "User profile updated successfully",
+          [
+            {
+              text: "Ok",
+              onPress: () => navigation.navigate("UserProfile"),
+            },
+          ],
+          { cancelable: false }
+        );
       } else {
         throw new Error("User document ID not found");
       }
+
     } catch (error) {
       console.error("Error updating user profile: ", error);
       alert("Failed to update user profile");
