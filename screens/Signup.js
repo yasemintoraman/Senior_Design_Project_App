@@ -122,19 +122,21 @@ export default function Signup({ navigation }) {
   return (
     <View style={styles.container}>
       <Image source={backImage} style={styles.backImage} />
-      <View style={styles.whiteSheet} />
+      <View />
       <SafeAreaView style={styles.form}>
         <Text style={styles.title}>Sign Up</Text>
-        <View style={styles.bannerView}>
+        <View style={{alignItems: "center", marginTop: -12, marginBottom:15}}>
+        <View style={styles.avatar}>
           {imageData.assets[0].uri === "" ? (
             <TouchableOpacity onPress={requestCameraPermission}>
               <Image source={require("../assets/camera.png")} style={styles.camera} />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.banner} onPress={requestCameraPermission}>
-              <Image source={{ uri: imageData.assets[0].uri }} style={styles.banner} />
+            <TouchableOpacity style={styles.avatar} onPress={requestCameraPermission}>
+              <Image source={{ uri: imageData.assets[0].uri }} style={styles.avatar} />
             </TouchableOpacity>
           )}
+        </View>
         </View>
         <TextInput
           style={styles.input}
@@ -231,7 +233,7 @@ const styles = StyleSheet.create({
   },
   backImage: {
     width: "100%",
-    height: 340,
+    height: "100%",
     position: "absolute",
     top: 0,
     resizeMode: "cover",
@@ -265,6 +267,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 17,
+  },
+  avatar: {
+    width: 84,
+    height: 84,
+    borderRadius: 46,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "orange",
+    marginHorizontal: 200,
   },
 });
