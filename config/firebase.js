@@ -40,6 +40,59 @@ export const usersRef = collection(database, "users");
 
 const favoritesRef = collection(database, "favorites");
 
+export const getUserProfile = async (uid) => {
+  try {
+    const userDocRef = doc(database, "users", uid);
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+      return userDoc.data();
+    } else {
+      console.log("No such document!");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting document:", error);
+    return null;
+  }
+};
+
+export const getUserData = async (uid, fieldName) => {
+  try {
+    const userRef = collection(database, "users");
+    const q = query(userRef, where("uid", "==", uid));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      throw new Error('Kullanıcı bilgileri bulunamadı.');
+    }
+
+    const userProfile = querySnapshot.docs[0].data();
+    return userProfile[fieldName]; // İstenen alanı döndür
+  } catch (error) {
+    console.error('Kullanıcı bilgileri getirilirken hata oluştu:', error);
+    throw error;
+  }
+};
+
+// Kullanıcının UID'sine göre kullanıcı bilgilerini alarak imageUrl'i döndüren metot
+export const getUserImageUrl = async (uid) => {
+  try {
+    const userRef = collection(database, "users");
+    const q = query(userRef, where("uid", "==", uid));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      throw new Error('Kullanıcı bilgileri bulunamadı.');
+    }
+
+    const userProfile = querySnapshot.docs[0].data();
+    return userProfile.imageUrl;
+  } catch (error) {
+    console.error('Kullanıcı bilgileri getirilirken hata oluştu:', error);
+    throw error;
+  }
+};
+
 export const useProductsListener = () => {
   const [products, setProducts] = useState([]);
 

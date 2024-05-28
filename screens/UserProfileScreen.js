@@ -11,7 +11,8 @@ import {
   ScrollView
 } from "react-native";
 import { Avatar } from "react-native-paper";
-import { auth, useUserPosts } from "../config/firebase";
+import { auth, getUserImageUrl, useUserPosts, getUserProfile, database} from "../config/firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import Ionic from "react-native-vector-icons/Ionicons";
 const width = Dimensions.get("window").width;
 import ProductItem2 from "../components/ProductsList/ProductItem";
@@ -26,8 +27,7 @@ import Login from "./Login";
 
 import EditProfile from "./EditProfile";
 
-const UserProfileScreen = ({navigation}) => {
-
+const UserProfileScreen = ({ navigation }) => {
   const onHandleLogout = () => {
     signOut(auth)
       .then(() => {
@@ -36,27 +36,71 @@ const UserProfileScreen = ({navigation}) => {
       .catch((err) => Alert.alert("Logout error", err.message));
   };
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const tabClicked = (index) => {
-    setActiveIndex(index);
-  };
   const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [currentUserNameSurname, setCurrentUserNameSurname] = useState("");
+  const [currentUserImage, setCurrentUserImage] = useState("");
+
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [userDocId, setUserDocId] = useState("");
 
   const userPosts = useUserPosts(currentUserEmail);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setCurrentUserEmail(user?.email ?? ""); // Eğer kullanıcı oturum açık değilse null dönecek
-      setCurrentUserNameSurname(user?.displayName ?? "");
-    });
-    return unsubscribe; // useEffect içinde fonksiyon dönerek, component kaldırıldığında dinleyiciyi kaldırıyoruz
+    const fetchUserData = async () => {
+      try {
+        const uid = auth.currentUser?.uid;
+        const user = auth.currentUser;
+
+        if (!uid) {
+          throw new Error("Kullanici oturumu bulunamadi.");
+        }
+
+        if (user) {
+          console.log("Current user ID:", user.uid);
+
+          const userRef = collection(database, "users");
+          const q = query(userRef, where("uid", "==", uid));
+          const querySnapshot = await getDocs(q);
+
+          if (querySnapshot.empty) {
+            throw new Error("Kullanici bilgileri bulunamadi.");
+          }
+          //const userProfile = querySnapshot.docs[0].data();
+          const userDoc = querySnapshot.docs[0];
+          const userProfile = userDoc.data();
+          setUserDocId(userDoc.id);
+          setName(userProfile.name);
+          setSurname(userProfile.surname);
+          setCurrentUserImage(userProfile.imageUrl);
+          //setEmail(userProfile.email);
+        } else {
+          console.log("No user is signed in.");
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+      throw error;
+    };
+
+    fetchUserData();
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      setCurrentUserEmail(auth.currentUser?.email ?? "");
-      setCurrentUserNameSurname(auth.currentUser?.displayName ?? "");
+      const fetchUserData = async () => {
+        try {
+          const user = auth.currentUser;
+          if (user) {
+            setCurrentUserEmail(user?.email ?? "");
+            const userImageUrl = await getUserImageUrl(user.uid);
+            setCurrentUserImage(userImageUrl);
+          }
+        } catch (error) {
+          console.error("Error fetching user data: ", error);
+        }
+      };
+      fetchUserData();
     }, [])
   );
 
@@ -91,70 +135,31 @@ const UserProfileScreen = ({navigation}) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fdf5ed"}}>
-      <View style={{ padding: 10}}>
+    <View style={{ flex: 1, backgroundColor: "#fdf5ed" }}>
+      <View style={{ padding: 10 }}>
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1, alignItems: "center" }}>
-            <Avatar.Text label={currentUserNameSurname ? currentUserNameSurname[0].toUpperCase() : ""} size={80} style={{backgroundColor: "#E0E0E0"}} />
-            <Text style={{fontSize: 20, paddingTop: 3, color: "gray"}}>{currentUserNameSurname}</Text>
+            <Avatar.Image source={{ uri: currentUserImage }} size={80} />
+            <Text style={{ fontSize: 20, paddingTop: 3, color: "gray" }}>{name} {surname}</Text>
           </View>
         </View>
       </View>
       <View>
-        <View style={{ flexDirection: "row", justifyContent: "space-around", paddingBottom:10 }}>
-          <View style={{ alignItems: "center", paddingLeft:10, }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-around", paddingBottom: 10 }}>
+          <View style={{ alignItems: "center", paddingLeft: 10 }}>
             <TouchableOpacity onPress={editPressHandler}>
-            <Text style={{ color: "#f57c00", fontWeight: "600", fontSize: 18, marginRight:-80 }}>Edit Profile</Text>
+              <Text style={{ color: "#f57c00", fontWeight: "600", fontSize: 18, marginRight: -80 }}>Edit Profile</Text>
             </TouchableOpacity>
           </View>
           <View style={{ alignItems: "center" }}>
             <TouchableOpacity onPress={onHandleLogout}>
-              <Text
-                style={{ color: "#f57c00", fontWeight: "600", fontSize: 18 }}
-              >
-                Logout
-              </Text>
+              <Text style={{ color: "#f57c00", fontWeight: "600", fontSize: 18 }}>Logout</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
-      {/** */}
       <View style={{ flex: 1 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-around",
-            borderTopWidth: 1,
-            borderTopColor: "#ccc",
-            paddingVertical: 8,
-          }}
-        >{/** 
-          <TouchableOpacity
-            style={{ alignItems: "center" }}
-            onPress={() => tabClicked(0)}
-            activeOpacity={0.7}
-          >
-            <Ionic
-              name="apps-sharp"
-              size={30}
-              style={{ color: activeIndex === 0 ? "black" : "gray" }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ alignItems: "center" }}
-            onPress={() => tabClicked(1)}
-            activeOpacity={0.7}
-          >
-            <Ionic
-              name="list-sharp"
-              size={30}
-              style={{ color: activeIndex === 1 ? "black" : "gray" }}
-            />
-          </TouchableOpacity>*/}
-        </View>
-
-      
-          <FlatList
+        <FlatList
           data={userPosts}
           numColumns={3}
           renderItem={({ item }) => (
@@ -187,36 +192,9 @@ const UserProfileScreen = ({navigation}) => {
           )}
           keyExtractor={(item) => item.id.toString()}
         />
-        
-{/** 
-        {activeIndex === 1 && ( //burasi düzenlenecek!! 21.05.24 (14:22)
-          <FlatList
-            data={userPosts}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View
-                style={{
-                  flex: 1,
-                  aspectRatio: 3 / 1,
-                  marginVertical: 3,
-                  padding: 3,
-                  marginLeft: 3,
-                  marginRight: 6
-                }}
-              >
-                <Image
-                 source={item.imageUrl ? { uri: item.imageUrl } : require("../assets/image_not_found.jpg")}
-                  style={{ width: "100%", height: "100%", borderRadius: 12 }}
-                />
-              </View>
-            )}
-          />
-        )}
-        */}
       </View>
     </View>
   );
 };
 
 export default UserProfileScreen;
-

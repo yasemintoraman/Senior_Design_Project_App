@@ -7,12 +7,14 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
-  Alert
+  Alert,
+  Image
 } from "react-native";
 import {
   auth,
   database,
   useUserEmail,
+  storage
 } from "../config/firebase";
 import {
   doc,
@@ -31,7 +33,8 @@ import {
   updatePassword,
   updateProfile,
 } from "firebase/auth";
-
+import * as ImagePicker from "expo-image-picker";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase Storage işlemleri için gerekli importlar
 export default function EditProfile({ navigation }) {
 
   const [userName, setUserName] = useState("");
@@ -40,9 +43,18 @@ export default function EditProfile({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [userDocId, setUserDocId] = useState("");
+  const [currentImageUrl, setCurrentImageUrl] = useState("");
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [selectedImageUri, setSelectedImageUri] = useState(null);
+  const [imageData, setImageData] = useState({
+    assets: [
+      {
+        uri: "",
+      },
+    ],
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -53,12 +65,9 @@ export default function EditProfile({ navigation }) {
         if (!uid) {
           throw new Error("Kullanici oturumu bulunamadi.");
         }
-        if (!user) {
-          throw new Error("Kullanici oturumu bulunamadi.");
-        }
 
         if (user) {
-          //console.log("Current user ID:", user.uid);
+          console.log("Current user ID:", user.uid);
 
           const userRef = collection(database, "users");
           const q = query(userRef, where("uid", "==", uid));
@@ -67,7 +76,6 @@ export default function EditProfile({ navigation }) {
           if (querySnapshot.empty) {
             throw new Error("Kullanici bilgileri bulunamadi.");
           }
-
           //const userProfile = querySnapshot.docs[0].data();
           const userDoc = querySnapshot.docs[0];
           const userProfile = userDoc.data();
@@ -75,6 +83,8 @@ export default function EditProfile({ navigation }) {
           setUserName(userProfile.userName);
           setName(userProfile.name);
           setSurname(userProfile.surname);
+          setCurrentImageUrl(userProfile.imageUrl);
+          
           //setEmail(userProfile.email);
           //console.log(userProfile.email);
         } else {
@@ -89,8 +99,48 @@ export default function EditProfile({ navigation }) {
     fetchUserData();
   }, []);
 
+  const selectImage = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        alert("Kamera rulosuna erişim izni gerekiyor!");
+        return;
+      }
+
+      const res = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!res.cancelled) {
+        setImageData(res);
+        const uri = res.assets[0].uri;
+        setCurrentImageUrl(uri);
+      }
+    } catch (error) {
+      console.error("Error selecting image: ", error);
+    }
+  };
+
   const handleSaveChanges = async () => {
     try {
+      let imageUrl = "";
+      if (imageData.assets[0].uri) {
+        const uri = imageData.assets[0].uri;
+        const fileName = "file_" + Date.now();
+        const storageRef = ref(storage, fileName);
+  
+        const response = await fetch(uri);
+        const blob = await response.blob();
+  
+        await uploadBytes(storageRef, blob);
+        imageUrl = await getDownloadURL(storageRef);
+        console.log("Dosya URL'si:", imageUrl);
+        setCurrentImageUrl(imageUrl);
+      }
+
       if (userDocId) {
         const userDocRef = doc(database, "users", userDocId);
 
@@ -98,7 +148,9 @@ export default function EditProfile({ navigation }) {
           userName: userName,
           name: name,
           surname: surname,
+          imageUrl: imageUrl,
         });
+
         const user = auth.currentUser;
         // Kullanıcının kimliğini yeniden doğrulama
         //const credential = EmailAuthProvider.credential(user.email, currentPassword);
@@ -137,6 +189,12 @@ export default function EditProfile({ navigation }) {
     <View style={styles.container}>
       <View style={styles.whiteSheet} />
       <SafeAreaView style={styles.form}>
+
+                
+        {/* Avatar için TouchableOpacity */}
+        <TouchableOpacity onPress={selectImage}>
+          <Image source={{ uri: currentImageUrl }} style={styles.avatar} />
+        </TouchableOpacity>
         <TextInput
           style={styles.input}
           placeholder="Username"
@@ -230,5 +288,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 40,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 20,
   },
 });
