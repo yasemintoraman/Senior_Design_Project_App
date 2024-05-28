@@ -86,7 +86,6 @@ const UserProfileScreen = ({ navigation }) => {
     signOut(auth)
       .then(() => {
         console.log("Logout success");
-        navigation.navigate("Login");
       })
       .catch((err) => Alert.alert("Logout error", err.message));
   };

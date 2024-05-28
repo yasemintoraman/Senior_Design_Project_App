@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Alert
 } from "react-native";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -112,9 +113,12 @@ const InfoScreen = ({ route, navigation }) => {
     if (!currentUserEmail || !userEmail) return;
 
     if (currentUserEmail === userEmail) {
-      console.error(
-        "Hata: Giriş yaptığınız e-posta ile alıcı e-posta aynı olamaz."
-      ); //bunu window haline getir!
+      Alert.alert(
+        "Error",
+        "The entered email cannot be the same as the logged-in email.",[
+          
+        ], { cancelable: true}
+      );
       return;
     }
 

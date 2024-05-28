@@ -209,20 +209,21 @@ const ChatList = () => {
     setIsLoading(true);
 
     if (email === userEmail) {
-      console.error(
-        "Error: The entered email cannot be the same as the logged-in email."
-      );
       Alert.alert(
         "Error",
-        "The entered email cannot be the same as the logged-in email."
+        "The entered email cannot be the same as the logged-in email.",[
+          
+        ], { cancelable: true}
       );
       setIsLoading(false);
       return;
     }
 
     if (!validateEmail(userEmail)) {
-      console.error("Error: The entered email is not in a valid format.");
-      Alert.alert("Error", "The entered email is not in a valid format.");
+      Alert.alert("Error", "The entered email is not in a valid format.",[
+          
+      ], { cancelable: true}
+    );
       setIsLoading(false);
       return;
     }
@@ -235,12 +236,12 @@ const ChatList = () => {
       const userSnapshot = await getDocs(userQuery);
 
       if (userSnapshot.empty) {
-        console.error(
-          "Error: The entered email is not registered in the system."
-        );
+
         Alert.alert(
           "Error",
-          "The entered email is not registered in the system."
+          "The entered email is not registered in the system.",[
+          
+          ], { cancelable: true}
         );
         setIsLoading(false);
         return;
