@@ -141,10 +141,6 @@ const AddProducts = ({ navigation }) => {
         [
           {
             text: "OK",
-            onPress: () => {
-              // Navigate to UserPostDetailScreen
-              navigation.navigate("AddedProductDetail");
-            },
           },
         ],
         { cancelable: false }
