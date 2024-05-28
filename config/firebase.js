@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth,  initializeAuth, getReactNativePersistence  } from "firebase/auth";
 import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, setDoc, serverTimestamp, orderBy, getDoc} from "firebase/firestore";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
@@ -9,6 +9,8 @@ import { getStorage } from "firebase/storage";
 import { setFavorites } from "../store/redux/favorites";
 
 import { getFormatedDate } from "react-native-modern-datepicker";
+
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 import * as Location from 'expo-location';
 import Geocoder from 'react-native-geocoding';
@@ -24,8 +26,11 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-initializeApp(firebaseConfig);
-export const auth = getAuth();
+const app = initializeApp(firebaseConfig);
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+});
+
 export const database = getFirestore();
 export const storage = getStorage();
 

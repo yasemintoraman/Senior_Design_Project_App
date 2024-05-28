@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   ActivityIndicator,
@@ -8,101 +8,88 @@ import {
   Image,
   TouchableOpacity,
   Text,
-  ScrollView
+  ScrollView,
+  Alert
 } from "react-native";
 import { Avatar } from "react-native-paper";
-import { auth, getUserImageUrl, useUserPosts, getUserProfile, database} from "../config/firebase";
+import { auth, getUserImageUrl, useUserPosts, getUserProfile, database } from "../config/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import Ionic from "react-native-vector-icons/Ionicons";
-const width = Dimensions.get("window").width;
-import ProductItem2 from "../components/ProductsList/ProductItem";
 import { signOut } from "firebase/auth";
-
-import ProductsList from "../components/ProductsList/ProductsList";
-
-import ProductDetails from "../components/ProductDetails";
 import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
-
+import ProductItem2 from "../components/ProductsList/ProductItem";
+import ProductsList from "../components/ProductsList/ProductsList";
+import ProductDetails from "../components/ProductDetails";
 import Login from "./Login";
-
 import EditProfile from "./EditProfile";
 
-const UserProfileScreen = ({ navigation }) => {
-  const onHandleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        console.log("Logout success");
-      })
-      .catch((err) => Alert.alert("Logout error", err.message));
-  };
+const width = Dimensions.get("window").width;
 
+const UserProfileScreen = ({ navigation }) => {
   const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [currentUserNameSurname, setCurrentUserNameSurname] = useState("");
   const [currentUserImage, setCurrentUserImage] = useState("");
-
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [userDocId, setUserDocId] = useState("");
 
   const userPosts = useUserPosts(currentUserEmail);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const uid = auth.currentUser?.uid;
-        const user = auth.currentUser;
+  const fetchUserData = useCallback(async () => {
+    try {
+      const uid = auth.currentUser?.uid;
+      const user = auth.currentUser;
 
-        if (!uid) {
-          throw new Error("Kullanici oturumu bulunamadi.");
-        }
-
-        if (user) {
-          console.log("Current user ID:", user.uid);
-
-          const userRef = collection(database, "users");
-          const q = query(userRef, where("uid", "==", uid));
-          const querySnapshot = await getDocs(q);
-
-          if (querySnapshot.empty) {
-            throw new Error("Kullanici bilgileri bulunamadi.");
-          }
-          //const userProfile = querySnapshot.docs[0].data();
-          const userDoc = querySnapshot.docs[0];
-          const userProfile = userDoc.data();
-          setUserDocId(userDoc.id);
-          setName(userProfile.name);
-          setSurname(userProfile.surname);
-          setCurrentUserImage(userProfile.imageUrl);
-          //setEmail(userProfile.email);
-        } else {
-          console.log("No user is signed in.");
-        }
-      } catch (error) {
-        console.error("Error fetching user data: ", error);
+      if (!uid) {
+        throw new Error("Kullanici oturumu bulunamadi.");
       }
-      throw error;
-    };
 
-    fetchUserData();
+      if (user) {
+        console.log("Current user ID:", user.uid);
+
+        const userRef = collection(database, "users");
+        const q = query(userRef, where("uid", "==", uid));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          throw new Error("Kullanici bilgileri bulunamadi.");
+        }
+
+        const userDoc = querySnapshot.docs[0];
+        const userProfile = userDoc.data();
+        setUserDocId(userDoc.id);
+        setName(userProfile.name);
+        setSurname(userProfile.surname);
+        setCurrentUserImage(userProfile.imageUrl);
+      } else {
+        console.log("No user is signed in.");
+      }
+    } catch (error) {
+      console.error("Error fetching user data: ", error);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
 
   useFocusEffect(
     React.useCallback(() => {
-      const fetchUserData = async () => {
-        try {
-          const user = auth.currentUser;
-          if (user) {
-            setCurrentUserEmail(user?.email ?? "");
-            const userImageUrl = await getUserImageUrl(user.uid);
-            setCurrentUserImage(userImageUrl);
-          }
-        } catch (error) {
-          console.error("Error fetching user data: ", error);
-        }
-      };
       fetchUserData();
-    }, [])
+      setCurrentUserEmail(auth.currentUser?.email ?? "");
+      setCurrentUserNameSurname(auth.currentUser?.displayName ?? "");
+      setCurrentUserImage(auth.currentUser?.photoURL ?? "");
+    }, [fetchUserData])
   );
+
+  const onHandleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        console.log("Logout success");
+        navigation.navigate("Login");
+      })
+      .catch((err) => Alert.alert("Logout error", err.message));
+  };
 
   if (currentUserEmail === "") {
     return (
@@ -112,7 +99,7 @@ const UserProfileScreen = ({ navigation }) => {
     );
   }
 
-  function renderProductItem(itemData) {
+  const renderProductItem = (itemData) => {
     const item = itemData.item;
 
     const productItemProps = {
@@ -122,17 +109,17 @@ const UserProfileScreen = ({ navigation }) => {
       price: item.price,
     };
     return <ProductItem2 {...productItemProps} />;
-  }
-  
-  function editPressHandler() {
-    navigation.navigate("EditProfile");
-  }
+  };
 
-  function pressHandler(productId) {
+  const editPressHandler = () => {
+    navigation.navigate("EditProfile");
+  };
+
+  const pressHandler = (productId) => {
     navigation.navigate("UserProductDetail", {
       productId: productId,
     });
-  }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fdf5ed" }}>
