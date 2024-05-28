@@ -65,6 +65,9 @@ function HomeStack() {
       <Stack.Screen
         name="ProductsOverview"
         component={ProductsOverviewScreen}
+        options={{
+          title: "Products",
+        }}
       />
       <Stack.Screen
         name="ProductDetail"
@@ -104,7 +107,9 @@ function AddProductStack() {
         contentStyle: { backgroundColor: "white" },
       }}
     >
-      <Stack.Screen name="AddProduct" component={AddProducts} />
+      <Stack.Screen name="AddProduct" component={AddProducts}         options={{
+          title: "Add Product",
+        }}/>
       <Stack.Screen name="AddedProductDetail" component={UserPostDetailScreen}/>
     </Stack.Navigator>
   );
@@ -134,7 +139,9 @@ function UserProfileStack() {
         contentStyle: { backgroundColor: "white" },
       }}
     >
-      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+      <Stack.Screen name="UserProfile" component={UserProfileScreen}         options={{
+          title: "User Profile",
+        }} />
       <Stack.Screen
         name="UserProductDetail"
         component={UserPostDetailScreen}
@@ -142,7 +149,9 @@ function UserProfileStack() {
           title: "About the Product",
         }}
       />
-      <Stack.Screen name="EditProfile" component={EditProfile}/>
+      <Stack.Screen name="EditProfile" component={EditProfile}         options={{
+          title: "Edit Profile",
+        }}/>
     </Stack.Navigator>
   );
 }
