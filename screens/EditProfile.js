@@ -126,7 +126,7 @@ export default function EditProfile({ navigation }) {
 
   const handleSaveChanges = async () => {
     try {
-      let imageUrl = "";
+      let imageUrl = currentImageUrl;
       if (imageData.assets[0].uri) {
         const uri = imageData.assets[0].uri;
         const fileName = "file_" + Date.now();
