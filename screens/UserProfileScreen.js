@@ -125,7 +125,7 @@ const UserProfileScreen = ({ navigation }) => {
       <View style={{ padding: 10 }}>
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1, alignItems: "center" }}>
-            <Avatar.Image source={{ uri: currentUserImage }} size={80} />
+            <Avatar.Image source={{ uri: currentUserImage || "https://firebasestorage.googleapis.com/v0/b/seniorapp-d52bc.appspot.com/o/No%20profile%20picture.jpeg?alt=media&token=302a22c9-11d6-4721-8f3f-4237188ee12f"}} size={80} />
             <Text style={{ fontSize: 20, paddingTop: 3, color: "gray" }}>{name} {surname}</Text>
           </View>
         </View>
