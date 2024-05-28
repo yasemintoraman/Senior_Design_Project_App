@@ -61,7 +61,7 @@ function HomeStack() {
         contentStyle: { backgroundColor: "white" },
       }}
     >
-      <Stack.Screen name="HomeCategories" component={CategoriesScreen} />
+      <Stack.Screen name="Categories" component={CategoriesScreen} />
       <Stack.Screen
         name="ProductsOverview"
         component={ProductsOverviewScreen}

@@ -6,6 +6,8 @@ import {
   Image,
   PermissionsAndroid,
   Platform,
+  Alert, 
+  ActivityIndicator
 } from "react-native";
 import {Picker} from '@react-native-picker/picker';
 
@@ -22,7 +24,9 @@ import { addProduct } from "../config/firebase";
 
 import RNPickerSelect from 'react-native-picker-select';
 
-const AddProducts = () => {
+import UserPostDetailScreen from "./UserPostDetailScreen";
+import { useNavigation } from '@react-navigation/native';
+const AddProducts = ({ navigation }) => {
   const [productName, setProductName] = useState("");
   const [productDesc, setProductDesc] = useState("");
   const [productPrice, setProductPrice] = useState("");
@@ -30,6 +34,8 @@ const AddProducts = () => {
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const categories = useCategoriesListener();
+
+  const [loading, setLoading] = useState(false);
 
   const selectCategory = (categoryId) => {
     setSelectedCategory(categoryId);
@@ -98,6 +104,7 @@ const AddProducts = () => {
     //console.log("Dosya adı:", imageData.assets[0].fileName);
     //const reference = storage().ref(imageData.assets[0].fileName);
     try {
+      setLoading(true);
       let imageUrl = "";
 
       if (imageData.assets[0].uri) {
@@ -118,16 +125,36 @@ const AddProducts = () => {
         setImageUrl(imageUrl);
       }
 
-      addProduct(
+      await addProduct(
         productCategory,
         productName,
         productDesc,
         productPrice,
         imageUrl,
       );
+
+      resetForm();
+
+      Alert.alert(
+        "Success",
+        "Product added successfully",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              // Navigate to UserPostDetailScreen
+              navigation.navigate("AddedProductDetail");
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+
     } catch (error) {
       console.error("Ürün kaydedilirken bir hata oluştu:", error);
-    }
+     } finally{
+      setLoading(false);
+     }
   };
   const pickerItems = categories.map(category => ({
     label: category.categoryName,
@@ -206,17 +233,19 @@ const AddProducts = () => {
         />
     </View>
 
-      <TouchableOpacity
+    <TouchableOpacity
         style={styles.button}
         onPress={() => {
           saveProduct();
-          resetForm();
         }}
       >
-        <Text style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}>
-          {" "}
-          Add Product
-        </Text>
+        {loading ? (
+          <ActivityIndicator size="large" style={styles.loadingContainer}/>
+        ) : (
+          <Text style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}>
+            Add Product
+          </Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -270,6 +299,11 @@ const styles = StyleSheet.create({
     alignItems:"center",
     justifyContent: "center",
     textAlign: "center"
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 const pickerSelectStyles = {

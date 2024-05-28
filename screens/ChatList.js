@@ -93,6 +93,10 @@ const ChatList = () => {
   }, [selectedItems]);
 
   const fetchUserProfiles = async (emails) => {
+    if (emails.length === 0) {
+      return {};
+    }
+
     const profiles = {};
     const userQuery = query(
       collection(database, "users"),
@@ -345,7 +349,7 @@ const ChatList = () => {
                 left={() => (
                   <Avatar.Image
                     source={{ uri: userProfiles[chat.users.find((x) => x !== email)]?.imageUrl ||
-                      "https://firebasestorage.googleapis.com/v0/b/sdpapp-5a06e.appspot.com/o/file_1716803139629?alt=media&token=c736ceb9-6d6c-4eea-bfe6-002c81b7ec7e",
+                      "https://firebasestorage.googleapis.com/v0/b/seniorapp-d52bc.appspot.com/o/No%20profile%20picture.jpeg?alt=media&token=302a22c9-11d6-4721-8f3f-4237188ee12f",
                     }}
                     size={46}
                     style={{marginLeft: 5}}
