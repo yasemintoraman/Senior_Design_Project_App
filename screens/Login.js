@@ -20,7 +20,7 @@ export default function Login({ navigation }) {
     return (
         <View style={styles.container}>
           <Image source={backImage} style={styles.backImage} />
-          <View style={styles.whiteSheet} />
+          <View />
           <SafeAreaView style={styles.form}>
             <Text style={styles.title}>Log In</Text>
              <TextInput
@@ -79,7 +79,7 @@ export default function Login({ navigation }) {
       },
       backImage: {
         width: "100%",
-        height: 340,
+        height: "100%",
         position: "absolute",
         top: 0,
         resizeMode: 'cover',
@@ -90,12 +90,14 @@ export default function Login({ navigation }) {
         position: "absolute",
         bottom: 0,
         backgroundColor: '#fff',
-        borderTopLeftRadius: 60,
+        borderTopLeftRadius: 50,
+        borderTopRightRadius: 50
       },
       form: {
         flex: 1,
         justifyContent: 'center',
         marginHorizontal: 30,
+        marginTop: 50
       },
       button: {
         backgroundColor: '#f57c00',
