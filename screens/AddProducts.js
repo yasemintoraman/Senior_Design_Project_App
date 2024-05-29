@@ -105,6 +105,19 @@ const AddProducts = ({ navigation }) => {
     //const reference = storage().ref(imageData.assets[0].fileName);
     try {
       setLoading(true);
+      const selectedCat = categories.find(category => category.categoryName === productCategory);
+
+      if (selectedCat?.showImage && !imageData.assets[0].uri) {
+        Alert.alert(
+          "Error",
+          "You must add an image for this category!",
+          [{ text: "OK" }],
+          { cancelable: false }
+        );
+        setLoading(false);
+        return;
+      }
+
       let imageUrl = "";
 
       if (imageData.assets[0].uri) {
