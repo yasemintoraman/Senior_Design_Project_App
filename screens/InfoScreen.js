@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
-  Alert
+  Alert, 
+  Share
 } from "react-native";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -42,6 +43,27 @@ const InfoScreen = ({ route, navigation }) => {
   const [selectedProduct, setSelectedProduct] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [userDetails, setUserDetails] = useState({ name: "", surname: "" });
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: ("Please install this app and stay safe, AppLink:  "),
+      });
+
+      if(result.action === Share.sharedAction) {
+        if(result.action.activityType){
+        console.log('Shared with activity type of: ', result.activityType)
+        } else {
+        console.log('shared');
+        }
+      } else if(result.action === Share.dismissedAction) {
+        console.log('dismissed');
+      }
+    }catch(error) {
+      console.log(error.message);
+    }
+
+  }
 
   const userEmail = selectedProduct.addedBy;
 
@@ -165,11 +187,18 @@ const InfoScreen = ({ route, navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <IconButton
+        <View style={{flexDirection: "row", alignItems: "center"}}>
+                  <IconButton
           icon={productIsFavorite ? "star" : "star-outline"}
           color="white"
           onPress={changeFavoriteStatusHandler}
         />
+
+         <View style={{ width: 15 }} />
+         <IconButton             icon="share-outline"
+        color="white"
+        onPress={onShare}/>
+</View>
       ),
     });
   }, [navigation, changeFavoriteStatusHandler]);
