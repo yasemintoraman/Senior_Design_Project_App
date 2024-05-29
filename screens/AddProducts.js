@@ -227,7 +227,7 @@ const AddProducts = ({ navigation }) => {
       <CustomTextInput
         placeholder={"Price"}
         value={productPrice}
-        type={"number-pad"}
+        type={"decimal-pad"}
         onChangeText={(txt) => {
           setProductPrice(txt);
         }}
