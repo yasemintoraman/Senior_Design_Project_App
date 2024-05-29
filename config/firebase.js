@@ -16,13 +16,13 @@ import * as Location from 'expo-location';
 import Geocoder from 'react-native-geocoding';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyALUMbaHmGId7oy-ijuTjjD0tceIbOS0kc",
-  authDomain: "sdpapp-5a06e.firebaseapp.com",
-  projectId: "sdpapp-5a06e",
-  storageBucket: "sdpapp-5a06e.appspot.com",
-  messagingSenderId: "384968976538",
-  appId: "1:384968976538:web:bd8aa00837a3fe5812d723",
-  databaseURL: "https://sdpapp-5a06e-default-rtdb.firebaseio.com/"
+  apiKey: "AIzaSyDj7odUsapy2SvP1-u_wms4MHnujcrVtE8",
+  authDomain: "seniorapp-d5b91.firebaseapp.com",
+  projectId: "seniorapp-d5b91",
+  storageBucket: "seniorapp-d5b91.appspot.com",
+  messagingSenderId: "537522018865",
+  appId: "1:537522018865:web:215e6878b63d47e9ad1310",
+  databaseURL: "https://seniorapp-d5b91-default-rtdb.europe-west1.firebasedatabase.app/"
 };
 
 // Initialize Firebase

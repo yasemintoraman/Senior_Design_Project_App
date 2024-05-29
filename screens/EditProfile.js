@@ -190,7 +190,7 @@ export default function EditProfile({ navigation }) {
       <View style={styles.whiteSheet} />
       <SafeAreaView style={styles.form}>
         <TouchableOpacity onPress={selectImage}>
-          <Image source={{ uri: currentImageUrl || "https://firebasestorage.googleapis.com/v0/b/seniorapp-d52bc.appspot.com/o/No%20profile%20picture.jpeg?alt=media&token=302a22c9-11d6-4721-8f3f-4237188ee12f" }} style={styles.avatar} />
+          <Image source={{ uri: currentImageUrl || "https://firebasestorage.googleapis.com/v0/b/seniorapp-d5b91.appspot.com/o/no-profile-picture.jpeg?alt=media&token=1b141542-8883-4dcf-b5b7-aef231d0fd3a" }} style={styles.avatar} />
         </TouchableOpacity>
         <TextInput
           style={styles.input}

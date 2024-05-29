@@ -253,7 +253,9 @@ const styles = StyleSheet.create({
   },
   price: {
     fontWeight: "600",
-    fontSize: 17,
+    fontSize: 15,
+    alignSelf: "center",
+    paddingLeft: 20
   },
   container: {
     flex: 1,
@@ -316,7 +318,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    fontSize: 26,
+    fontSize: 23,
     lineHeight: 30,
     color: "black",
     fontWeight: "500",
