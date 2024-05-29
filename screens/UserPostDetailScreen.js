@@ -97,11 +97,13 @@ const UserPostDetailScreen = ({ route, navigation }) => {
                 source={{ uri: selectedProduct.imageUrl }}
                 style={styles.productImage}
               />
-              <Text style={styles.dateText}>
-                {selectedProduct && selectedProduct.createdAt}
-              </Text>
             </View>
           )}
+          <View style={{alignItems: "center", marginTop: 10}}>
+          <Text style={styles.dateText}>
+                {selectedProduct && selectedProduct.createdAt}
+              </Text>
+          </View>
           <View>
             <View style={styles.headSection}>
               <View style={styles.topTextArea}>
@@ -155,7 +157,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontWeight: "600",
-    fontSize: 15,
+    fontSize: 16,
     alignSelf: "center",
     paddingLeft: 20
   },
@@ -203,7 +205,7 @@ const styles = StyleSheet.create({
     height: 300,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22,
+    marginTop: 5,
   },
   productImage: {
     width: 300,

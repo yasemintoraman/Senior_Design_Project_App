@@ -189,12 +189,7 @@ const InfoScreen = ({ route, navigation }) => {
                 source={{ uri: selectedProduct.imageUrl }}
                 style={styles.productImage}
               />
-                          <Text style={styles.addedByText}>
-              {userDetails.name} {userDetails.surname} & {selectedProduct.addedBy}
-            </Text>
-            <Text style={styles.dateText}>
-              {selectedProduct && selectedProduct.createdAt}
-            </Text>
+
               {/** 
               <View style={styles.addedByContainer}>
               <Ionic name="person-outline" size={18}  />
@@ -204,6 +199,14 @@ const InfoScreen = ({ route, navigation }) => {
             </View>*/}
             </View>
           )}
+          <View style={{justifyContent: "center", alignItems: "center", marginTop: 2}}>
+                                    <Text style={styles.addedByText}>
+              {userDetails.name} {userDetails.surname} & {selectedProduct.addedBy}
+            </Text>
+            <Text style={styles.dateText}>
+              {selectedProduct && selectedProduct.createdAt}
+            </Text>
+            </View>
           <View>
             <View style={styles.headSection}>
               <View style={styles.topTextArea}>
@@ -302,7 +305,7 @@ const styles = StyleSheet.create({
     height: 300,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22
+    marginTop: 5
   },
   productImage: {
     width: 300,
@@ -311,7 +314,7 @@ const styles = StyleSheet.create({
   },
 
   headSection: {
-    marginTop: 30,
+    marginTop: 15,
   },
   topTextArea: {
     flexDirection: "row",
@@ -335,7 +338,6 @@ const styles = StyleSheet.create({
   },
   addedByText: {
     marginTop: 5,
-    marginLeft: 5,
     fontSize: 16,
     color: "black",
     justifyContent:"center",
