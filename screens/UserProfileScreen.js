@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Text,
   ScrollView,
-  Alert
+  Alert, Platform
 } from "react-native";
 import { Avatar } from "react-native-paper";
 import { auth, getUserImageUrl, useUserPosts, getUserProfile, database } from "../config/firebase";
@@ -90,6 +90,11 @@ const UserProfileScreen = ({ navigation }) => {
       .catch((err) => Alert.alert("Logout error", err.message));
   };
 
+  const [activeIndex, setActiveIndex] = useState(0);
+  const tabClicked = (index) => {
+    setActiveIndex(index);
+  };
+
   if (currentUserEmail === "") {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -145,6 +150,56 @@ const UserProfileScreen = ({ navigation }) => {
         </View>
       </View>
       <View style={{ flex: 1 }}>
+      <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            borderTopWidth: 1,
+            borderTopColor: "#ccc",
+            paddingVertical: 10,
+          }}
+        >
+          <TouchableOpacity
+            style={{ alignItems: "center" }}
+            onPress={() => tabClicked(0)}
+            activeOpacity={0.7}
+          >
+            <Ionic
+              name="apps-sharp"
+              size={26}
+              style={{ color: activeIndex === 0 ? "black" : "gray" }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ alignItems: "center" }}
+            onPress={() => tabClicked(1)}
+            activeOpacity={0.7}
+          >
+            <Ionic
+              name="list-sharp"
+              size={29
+              }
+              style={{ color: activeIndex === 1 ? "black" : "gray" }}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {activeIndex === 1 && (
+          <ScrollView>
+            {userPosts.map((item) => (
+              <TouchableOpacity key={item.id} onPress={() => pressHandler(item.id)}>
+                <View
+                  style={styles.productItem}>
+                  <Text style={styles.title}>{item.title}</Text>
+                  <View style={styles.details}>
+                  <Text style={styles.detailItem}>Price: {item.price}</Text></View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
+
+      {activeIndex === 0 && (
         <FlatList
           data={userPosts}
           numColumns={3}
@@ -178,9 +233,51 @@ const UserProfileScreen = ({ navigation }) => {
           )}
           keyExtractor={(item) => item.id.toString()}
         />
+      )}
       </View>
     </View>
   );
 };
 
 export default UserProfileScreen;
+const styles = StyleSheet.create({
+  productItem: {
+    margin: 5,
+    marginTop:10,
+    borderRadius: 8,
+    overflow: Platform.OS === "android" ? "hidden" : "visible",
+    backgroundColor: "#e2eae3",
+    elevation: 4,
+    shadowColor: "black",
+    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+  },
+  buttonPressed: {
+    opacity: 0.5,
+  },
+  innerContainer: {
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  image: {
+    width: "100%",
+    height: 200,
+  },
+  title: {
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 18,
+    margin: 4,
+  },
+  details: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 2,
+  },
+  detailItem: {
+    marginHorizontal: 4,
+    fontSize: 12,
+  },
+});
